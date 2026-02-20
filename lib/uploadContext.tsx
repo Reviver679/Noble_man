@@ -17,16 +17,20 @@ export interface UploadContextType {
   uploadedImage: File | null;
   generatedImage: Blob | null;
   watermarkedImage: Blob | null;
+  generatedImageUrl: string | null;
+  requestId: string | null;
   style: StyleType;
   processing: boolean;
   error: string | null;
   purchaseData: PurchaseData | null;
-  
+
   // Actions
   setStep: (step: UploadStep) => void;
   setUploadedImage: (file: File | null) => void;
   setGeneratedImage: (blob: Blob | null) => void;
   setWatermarkedImage: (blob: Blob | null) => void;
+  setGeneratedImageUrl: (url: string | null) => void;
+  setRequestId: (id: string | null) => void;
   setStyle: (style: StyleType) => void;
   setProcessing: (processing: boolean) => void;
   setError: (error: string | null) => void;
@@ -41,6 +45,8 @@ export function UploadProvider({ children }: { children: ReactNode }) {
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [generatedImage, setGeneratedImage] = useState<Blob | null>(null);
   const [watermarkedImage, setWatermarkedImage] = useState<Blob | null>(null);
+  const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
+  const [requestId, setRequestId] = useState<string | null>(null);
   const [style, setStyle] = useState<StyleType>('humans');
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,6 +57,8 @@ export function UploadProvider({ children }: { children: ReactNode }) {
     setUploadedImage(null);
     setGeneratedImage(null);
     setWatermarkedImage(null);
+    setGeneratedImageUrl(null);
+    setRequestId(null);
     setStyle('humans');
     setProcessing(false);
     setError(null);
@@ -62,6 +70,8 @@ export function UploadProvider({ children }: { children: ReactNode }) {
     uploadedImage,
     generatedImage,
     watermarkedImage,
+    generatedImageUrl,
+    requestId,
     style,
     processing,
     error,
@@ -70,6 +80,8 @@ export function UploadProvider({ children }: { children: ReactNode }) {
     setUploadedImage,
     setGeneratedImage,
     setWatermarkedImage,
+    setGeneratedImageUrl,
+    setRequestId,
     setStyle,
     setProcessing,
     setError,

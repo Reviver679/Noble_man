@@ -1,58 +1,235 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useUploadContext } from '@/lib/uploadContext';
 import { addWatermark, blobToDataUrl } from '@/lib/watermark';
-import { ChevronLeft, Loader2 } from 'lucide-react';
+import { ChevronLeft, Loader2, Download, Printer, Frame, Check } from 'lucide-react';
+
+const POLL_INTERVAL_MS = 5000;
+const MAX_POLL_ATTEMPTS = 60; // 5 minutes max
 
 export default function PreviewStep() {
-  const { setStep, uploadedImage, setGeneratedImage, generatedImage, setWatermarkedImage, watermarkedImage, setError, setProcessing, processing } = useUploadContext();
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [isApplyingWatermark, setIsApplyingWatermark] = useState(false);
+  const {
+    setStep,
+    uploadedImage,
+    setGeneratedImage,
+    generatedImage,
+    setWatermarkedImage,
+    setGeneratedImageUrl,
+    generatedImageUrl,
+    setRequestId,
+    requestId,
+    setError,
+    setProcessing,
+    processing,
+  } = useUploadContext();
 
-  // Generate portrait (call your AI API here)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [statusMessage, setStatusMessage] = useState('Submitting your photo...');
+  const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pollCountRef = useRef(0);
+  const isSubmittedRef = useRef(false);
+
+  const products = [
+    {
+      id: 'digital',
+      name: 'Instant Masterpiece',
+      price: 29,
+      originalPrice: 49,
+      icon: Download,
+      description: 'Instant high-resolution download – perfect for sharing or saving',
+      benefits: [
+        'No Watermark',
+        'Instant Download',
+        'High-Resolution Format',
+      ],
+      buttonLabel: 'Download Now',
+    },
+    {
+      id: 'print',
+      name: 'Fine Art Print',
+      price: 89,
+      originalPrice: 129,
+      icon: Printer,
+      description: 'Printed on museum-quality archival paper with fade-resistant inks.',
+      benefits: [
+        'Museum-quality archival paper',
+        'Fade-resistant inks',
+        'Made to last decades',
+      ],
+      buttonLabel: 'Order Print',
+    },
+    {
+      id: 'canvas',
+      name: 'Large Canvas',
+      price: 299,
+      originalPrice: 399,
+      icon: Frame,
+      description: 'Gallery-quality canvas on a 1.25″ thick frame – arrives ready to hang.',
+      benefits: [
+        'Ready to hang',
+        'Cotton-blend canvas, 1.25" thick',
+        'Mounting included',
+      ],
+      buttonLabel: 'Order Canvas',
+      highlighted: true,
+    },
+  ];
+
+  // Convert File to base64 data URL
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Poll for face swap status
+  const pollStatus = useCallback(async (reqId: string) => {
+    if (pollCountRef.current >= MAX_POLL_ATTEMPTS) {
+      setError('Generation timed out. Please try again.');
+      setProcessing(false);
+      return;
+    }
+
+    pollCountRef.current += 1;
+
+    try {
+      const res = await fetch('/api/face/status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ request_id: reqId }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Status check failed: ${res.statusText}`);
+      }
+
+      const data = await res.json();
+      const status = data.message?.status;
+
+      if (status === 'Completed') {
+        const imageDataUrl = data.message.image_data_url;
+        setGeneratedImageUrl(imageDataUrl);
+        setStatusMessage('Applying watermark...');
+
+        // Fetch the image as a blob for watermarking
+        const imgResponse = await fetch(imageDataUrl);
+        const imgBlob = await imgResponse.blob();
+        setGeneratedImage(imgBlob);
+
+        // Apply watermark for preview
+        const watermarked = await addWatermark(imgBlob);
+        setWatermarkedImage(watermarked);
+
+        const wmUrl = await blobToDataUrl(watermarked);
+        setPreviewUrl(wmUrl);
+        setProcessing(false);
+        setStep('preview');
+        return;
+      } else if (status === 'Failed') {
+        setError(data.message?.error || 'Portrait generation failed. Please try again.');
+        setProcessing(false);
+        return;
+      }
+
+      // Update status message
+      if (status === 'Processing') {
+        setStatusMessage('AI is painting your portrait...');
+      } else if (status === 'Queued') {
+        setStatusMessage('Waiting in queue...');
+      }
+
+      // Schedule next poll
+      pollTimerRef.current = setTimeout(() => pollStatus(reqId), POLL_INTERVAL_MS);
+    } catch (err) {
+      console.error('[PreviewStep] Poll error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to check status');
+      setProcessing(false);
+    }
+  }, [setError, setProcessing, setGeneratedImage, setGeneratedImageUrl, setWatermarkedImage, setStep]);
+
+  // Submit image for face swap
   useEffect(() => {
-    const generatePortrait = async () => {
-      if (!uploadedImage || generatedImage) return;
+    const submitImage = async () => {
+      if (!uploadedImage || isSubmittedRef.current) return;
+      isSubmittedRef.current = true;
 
       try {
         setProcessing(true);
         setError(null);
 
-        // TODO: Replace this with your actual AI API call
-        // For now, we'll simulate the generation process
-        console.log('[v0] Starting portrait generation...');
+        // Convert to base64
+        const base64 = await fileToBase64(uploadedImage);
 
-        // Simulate generation delay (15-25 seconds would be real)
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Generate a session user ID
+        const userId = `session-${Date.now()}-${Math.random().toString(36).substring(7)}`;
 
-        // Mock: convert uploaded image to generated image
-        // In real implementation, this would be the AI-generated result
-        const generatedBlob = uploadedImage;
-        setGeneratedImage(generatedBlob);
+        // Submit to face swap API
+        const res = await fetch('/api/face/process', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image: base64,
+            user_id: userId,
+          }),
+        });
 
-        // Apply watermark
-        console.log('[v0] Applying watermark...');
-        const watermarked = await addWatermark(generatedBlob);
-        setWatermarkedImage(watermarked);
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.error || 'Failed to submit image');
+        }
 
-        // Get preview URL
-        const url = await blobToDataUrl(watermarked);
-        setPreviewUrl(url);
+        const data = await res.json();
+        const reqId = data.message?.request_id;
 
-        setProcessing(false);
+        if (!reqId) {
+          throw new Error('No request_id returned from API');
+        }
+
+        setRequestId(reqId);
+        setStatusMessage('Waiting in queue...');
+
+        // Start polling
+        pollCountRef.current = 0;
+        pollTimerRef.current = setTimeout(() => pollStatus(reqId), POLL_INTERVAL_MS);
       } catch (err) {
-        console.error('[v0] Generation error:', err);
+        console.error('[PreviewStep] Submit error:', err);
         setError(err instanceof Error ? err.message : 'Failed to generate portrait');
         setProcessing(false);
       }
     };
 
-    generatePortrait();
-  }, [uploadedImage, generatedImage, setGeneratedImage, setWatermarkedImage, setProcessing, setError]);
+    submitImage();
+
+    return () => {
+      if (pollTimerRef.current) {
+        clearTimeout(pollTimerRef.current);
+      }
+    };
+  }, [uploadedImage, setProcessing, setError, setRequestId, pollStatus]);
+
+  // If we already have a generated image (e.g., navigating back), show preview directly
+  useEffect(() => {
+    const showExistingPreview = async () => {
+      if (generatedImage && !previewUrl && !processing) {
+        const watermarked = await addWatermark(generatedImage);
+        setWatermarkedImage(watermarked);
+        const url = await blobToDataUrl(watermarked);
+        setPreviewUrl(url);
+      }
+    };
+    showExistingPreview();
+  }, [generatedImage, previewUrl, processing, setWatermarkedImage]);
 
   const handleBack = () => {
+    if (pollTimerRef.current) {
+      clearTimeout(pollTimerRef.current);
+    }
+    isSubmittedRef.current = false;
     setStep('upload');
   };
 
@@ -80,8 +257,13 @@ export default function PreviewStep() {
               Creating Your Masterpiece
             </h2>
             <p className="text-muted-foreground">
-              This may take 15-25 seconds...
+              {statusMessage}
             </p>
+            {requestId && (
+              <p className="text-xs text-muted-foreground/60 font-mono mt-4">
+                Request: {requestId}
+              </p>
+            )}
           </div>
         </div>
       </motion.div>
@@ -127,7 +309,6 @@ export default function PreviewStep() {
 
               {/* Free Preview Badge */}
               <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground bg-card rounded-lg py-3 border border-border">
-                <span className="text-lg">🎨</span>
                 <span>
                   Free preview · <span className="text-foreground font-semibold">Watermarked</span>
                 </span>
@@ -136,33 +317,119 @@ export default function PreviewStep() {
           )}
         </motion.div>
 
-        {/* CTA Section */}
+        {/* Quick Actions */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.5 }}
-          className="space-y-4"
+          className="space-y-3"
         >
           <button
             onClick={handlePurchase}
-            className="w-full py-4 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+            className="w-full py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors"
           >
             Download Unwatermarked
           </button>
           <button
             onClick={handleBack}
-            className="w-full py-4 border border-primary text-primary rounded-lg font-semibold hover:bg-primary/5 transition-colors"
+            className="w-full py-3 border border-primary text-primary rounded-lg font-semibold hover:bg-primary/5 transition-colors"
           >
             Generate Another
           </button>
+        </motion.div>
+
+        {/* Divider */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.35 }}
+          className="py-8 border-t border-border"
+        />
+
+        {/* Product Options Section */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+          className="space-y-8"
+        >
+          {/* Section Title */}
+          <div className="text-center">
+            <h3 className="font-serif text-2xl font-bold text-foreground">
+              Or Choose Your Format
+            </h3>
+            <p className="text-sm text-muted-foreground mt-2">
+              Order a professionally printed or canvas version
+            </p>
+          </div>
+
+          {/* Products Grid */}
+          <div className="grid md:grid-cols-3 gap-6">
+            {products.map((product, index) => (
+              <motion.div
+                key={product.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className={`border rounded-lg p-6 transition-all text-center ${product.highlighted
+                  ? 'border-primary bg-primary/5 md:scale-105'
+                  : 'border-border hover:border-primary/50'
+                  }`}
+              >
+                {/* Icon */}
+                <div className="flex justify-center mb-4">
+                  <product.icon size={32} className="text-primary" />
+                </div>
+
+                {/* Title */}
+                <h4 className="font-serif text-lg font-bold text-foreground mb-2">
+                  {product.name}
+                </h4>
+
+                {/* Pricing */}
+                <div className="mb-3">
+                  <span className="text-2xl font-bold text-foreground">
+                    ${product.price}
+                  </span>
+                  <span className="text-xs line-through text-muted-foreground ml-2">
+                    ${product.originalPrice}
+                  </span>
+                </div>
+
+                {/* Description */}
+                <p className="text-xs text-muted-foreground mb-4 min-h-[40px]">
+                  {product.description}
+                </p>
+
+                {/* Benefits */}
+                <div className="space-y-1.5 mb-4">
+                  {product.benefits.map((benefit, idx) => (
+                    <div key={idx} className="flex items-center justify-center gap-2 text-xs text-foreground">
+                      <Check size={14} className="text-primary flex-shrink-0" />
+                      <span>{benefit}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* CTA Button */}
+                <button
+                  onClick={() => setStep('checkout')}
+                  className="w-full py-2.5 px-4 rounded-lg font-semibold text-sm transition-colors bg-primary text-primary-foreground hover:bg-primary/90"
+                >
+                  {product.buttonLabel}
+                </button>
+              </motion.div>
+            ))}
+          </div>
         </motion.div>
 
         {/* Trust & Info */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-          className="grid grid-cols-2 gap-4 pt-8 border-t border-border"
+          transition={{ delay: 0.5, duration: 0.5 }}
+          className="grid grid-cols-2 gap-4 pt-12 border-t border-border"
         >
           <div className="text-center space-y-2">
             <p className="text-2xl font-bold text-primary">1M+</p>
@@ -170,7 +437,7 @@ export default function PreviewStep() {
           </div>
           <div className="text-center space-y-2">
             <p className="text-2xl font-bold text-primary">4.8★</p>
-            <p className="text-sm text-muted-foreground">Trustpilot Rating</p>
+            <p className="text-sm text-muted-foreground">TrustCaptain Rating</p>
           </div>
         </motion.div>
       </div>

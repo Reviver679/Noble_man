@@ -110,11 +110,10 @@ export default function UploadStep() {
           onDragLeave={handleDrag}
           onDragOver={handleDrag}
           onDrop={handleDrop}
-          className={`relative border-2 border-dashed rounded-2xl p-12 text-center transition-colors cursor-pointer ${
-            isDragActive
-              ? 'border-primary bg-primary/5'
-              : 'border-border hover:border-primary/50'
-          }`}
+          className={`relative border-2 border-dashed rounded-2xl p-12 text-center transition-colors cursor-pointer ${isDragActive
+            ? 'border-primary bg-primary/5'
+            : 'border-border hover:border-primary/50'
+            }`}
           onClick={() => fileInputRef.current?.click()}
         >
           <input
@@ -137,17 +136,17 @@ export default function UploadStep() {
               <p className="text-sm text-muted-foreground">Click to change image</p>
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-4">
               <div className="flex justify-center">
-                <div className="bg-card rounded-full p-6 border border-border">
-                  <Upload className="w-12 h-12 text-primary" />
+                <div className="bg-card rounded-full p-4 border border-border">
+                  <Upload className="w-8 h-8 text-primary" />
                 </div>
               </div>
               <div className="space-y-2">
-                <p className="text-lg font-semibold text-foreground">
+                <p className="text-base font-semibold text-foreground">
                   Upload one or more photos – {style === 'humans' ? 'people and pets' : 'pets'} welcome.
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   Each face clearly visible
                 </p>
               </div>
@@ -198,9 +197,15 @@ export default function UploadStep() {
           className="text-center space-y-2 pt-8 border-t border-border"
         >
           <div className="flex items-center justify-center gap-2">
-            <span className="text-2xl">✨</span>
             <p className="text-lg font-semibold text-foreground">Excellent</p>
-            <span className="text-primary">⭐⭐⭐⭐⭐</span>
+            <div className="flex gap-1">
+              {[...Array(5)].map((_, i) => (
+                <svg key={i} className="w-4 h-4 fill-primary" viewBox="0 0 20 20">
+                  <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                </svg>
+              ))}
+            </div>
+            <span className="text-muted-foreground text-sm">TrustCaptain</span>
           </div>
           <p className="text-sm text-muted-foreground">Over 1 million portraits made</p>
         </motion.div>

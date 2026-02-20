@@ -4,12 +4,10 @@
  * Currently structured for mock data, easily swappable with real API calls
  */
 
-// Environment variables (add these to your .env.local when ready to integrate with real Shopify)
-// NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN=your-store.myshopify.com
-// NEXT_PUBLIC_SHOPIFY_STOREFRONT_TOKEN=your-storefront-access-token
-
-const SHOPIFY_STORE_DOMAIN = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN;
-const SHOPIFY_STOREFRONT_TOKEN = process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_TOKEN;
+const SHOPIFY_STORE_DOMAIN = process.env.NEXT_PUBLIC_SHOP_DOMAIN;
+const SHOPIFY_STOREFRONT_TOKEN = process.env.NEXT_PUBLIC_STOREFRONT_TOKEN;
+const HD_VARIANT_ID = process.env.NEXT_DIGITAL_VARIENT_ID || '';
+const PRINT_VARIANT_ID = process.env.NEXT_PHYSICAL_PRINT_VARIENT_ID || '';
 
 /**
  * Shopify GraphQL Query Interface
@@ -129,6 +127,30 @@ export const createShopifyCheckout = async (
     console.error('Error creating Shopify checkout:', error);
   }
   return null;
+};
+
+/**
+ * Create a Shopify cart with a single item and return the checkout URL
+ * @param productType - 'digital' or 'print'
+ * @returns The Shopify checkout URL, or null on error
+ */
+export const createCart = async (
+  productType: 'digital' | 'print'
+): Promise<string | null> => {
+  const variantId =
+    productType === 'digital' ? HD_VARIANT_ID : PRINT_VARIANT_ID;
+
+  if (!variantId) {
+    console.error(`No variant ID configured for ${productType}`);
+    return null;
+  }
+
+  // Shopify Storefront API expects GID format
+  const gid = variantId.startsWith('gid://')
+    ? variantId
+    : `gid://shopify/ProductVariant/${variantId}`;
+
+  return createShopifyCheckout([{ variantId: gid, quantity: 1 }]);
 };
 
 /**

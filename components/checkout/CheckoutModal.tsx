@@ -3,14 +3,41 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useUploadContext } from '@/lib/uploadContext';
-import { downloadBlob } from '@/lib/watermark';
-import { AlertCircle, Check, Loader2, ChevronLeft } from 'lucide-react';
+import { AlertCircle, Check, Loader2, ChevronLeft, Download, Printer, Lock, Heart, Truck } from 'lucide-react';
+
+type ProductType = 'digital' | 'print';
 
 export default function CheckoutModal() {
-  const { generatedImage, setStep, setPurchaseData, setError, error } = useUploadContext();
+  const { setStep, setError, error } = useUploadContext();
   const [formData, setFormData] = useState({ email: '', fullName: '' });
+  const [selectedProduct, setSelectedProduct] = useState<ProductType>('digital');
   const [processing, setProcessing] = useState(false);
   const [completed, setCompleted] = useState(false);
+
+  const products: {
+    id: ProductType;
+    label: string;
+    sublabel: string;
+    price: number;
+    icon: React.ElementType;
+    badge?: string;
+  }[] = [
+      {
+        id: 'digital',
+        label: 'HD Digital Download',
+        sublabel: 'Full resolution, no watermark — instant delivery',
+        price: 25,
+        icon: Download,
+        badge: 'MOST POPULAR',
+      },
+      {
+        id: 'print',
+        label: 'Premium Framed Print',
+        sublabel: 'Museum-quality print, shipped to your door',
+        price: 50,
+        icon: Printer,
+      },
+    ];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -19,16 +46,16 @@ export default function CheckoutModal() {
   };
 
   const validateForm = () => {
-    if (!formData.email) {
+    if (!formData.fullName.trim()) {
+      setError('Full name is required');
+      return false;
+    }
+    if (!formData.email.trim()) {
       setError('Email is required');
       return false;
     }
     if (!formData.email.includes('@')) {
-      setError('Please enter a valid email');
-      return false;
-    }
-    if (!formData.fullName) {
-      setError('Full name is required');
+      setError('Please enter a valid email address');
       return false;
     }
     return true;
@@ -36,40 +63,43 @@ export default function CheckoutModal() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!validateForm()) return;
 
     try {
       setProcessing(true);
       setError(null);
 
-      // Simulate payment processing (2 seconds)
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const res = await fetch('/api/shopify/cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productType: selectedProduct,
+          email: formData.email,
+          fullName: formData.fullName,
+        }),
+      });
 
-      // Create mock order
-      const orderId = `NOBL-${Date.now()}`;
-
-      // Download unwatermarked image
-      if (generatedImage) {
-        downloadBlob(generatedImage, `noblified-portrait-${orderId}.png`);
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || 'Failed to create checkout');
       }
 
-      // Store purchase data
-      setPurchaseData({
-        email: formData.email,
-        fullName: formData.fullName,
-        productType: 'digital',
-        orderId,
-      });
+      const data = await res.json();
+      const { checkoutUrl } = data;
+
+      if (!checkoutUrl) {
+        throw new Error('No checkout URL returned');
+      }
 
       setCompleted(true);
 
-      // Transition to success after a moment
+      // Brief success flash before redirect
       setTimeout(() => {
-        setStep('success');
-      }, 1500);
+        window.location.href = checkoutUrl;
+      }, 1000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Payment processing failed');
+      console.error('[Checkout] Error:', err);
+      setError(err instanceof Error ? err.message : 'Checkout failed. Please try again.');
       setProcessing(false);
     }
   };
@@ -93,8 +123,8 @@ export default function CheckoutModal() {
           >
             <Check className="w-16 h-16 text-primary mx-auto" />
           </motion.div>
-          <h2 className="font-serif text-3xl font-bold text-foreground">Payment Successful!</h2>
-          <p className="text-muted-foreground">Your unwatermarked portrait is downloading...</p>
+          <h2 className="font-serif text-3xl font-bold text-foreground">Redirecting to Checkout...</h2>
+          <p className="text-muted-foreground">You'll be taken to our secure payment page.</p>
         </div>
       </motion.div>
     );
@@ -117,28 +147,83 @@ export default function CheckoutModal() {
           className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
         >
           <ChevronLeft className="w-5 h-5" />
-          Back
+          Back to Preview
         </motion.button>
 
-        {/* Form Section */}
+        {/* Header */}
         <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15, duration: 0.5 }}
+          className="text-center space-y-2"
+        >
+          <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground">
+            Get Your Portrait
+          </h2>
+          <p className="text-muted-foreground">
+            Choose your format, then complete your details below
+          </p>
+        </motion.div>
+
+        <motion.form
+          onSubmit={handleSubmit}
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
-          className="bg-card rounded-lg border border-border p-8 space-y-6"
+          className="space-y-6"
         >
-          <h2 className="font-serif text-3xl font-bold text-foreground">Complete Your Purchase</h2>
-
-          {/* Product Summary */}
-          <div className="bg-background rounded-lg p-4 border border-border space-y-2">
-            <p className="text-sm text-muted-foreground">Product</p>
-            <p className="font-semibold text-foreground">Digital Download (Unwatermarked)</p>
-            <p className="text-2xl font-bold text-primary pt-2">$29.99</p>
+          {/* Product Selection */}
+          <div className="space-y-4">
+            {products.map(product => {
+              const Icon = product.icon;
+              const isSelected = selectedProduct === product.id;
+              return (
+                <button
+                  key={product.id}
+                  type="button"
+                  onClick={() => setSelectedProduct(product.id)}
+                  className={`w-full text-left bg-card rounded-lg border-2 p-5 transition-all relative ${isSelected
+                    ? 'border-primary'
+                    : 'border-border hover:border-primary/40'
+                    }`}
+                >
+                  {product.badge && (
+                    <span className="absolute -top-3 left-5 bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full">
+                      {product.badge}
+                    </span>
+                  )}
+                  <div className="flex items-center justify-between pt-1">
+                    <div className="flex items-center gap-3">
+                      <Icon
+                        size={22}
+                        className={isSelected ? 'text-primary' : 'text-muted-foreground'}
+                      />
+                      <div>
+                        <p className="font-semibold text-foreground">{product.label}</p>
+                        <p className="text-sm text-muted-foreground">{product.sublabel}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 flex-shrink-0 ml-4">
+                      <p className={`text-xl font-bold ${isSelected ? 'text-primary' : 'text-foreground'}`}>
+                        ${product.price}
+                      </p>
+                      <div
+                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${isSelected ? 'border-primary bg-primary' : 'border-border'
+                          }`}
+                      >
+                        {isSelected && <Check size={12} className="text-primary-foreground" />}
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
           </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Full Name */}
+          {/* Contact Details */}
+          <div className="bg-card rounded-lg border border-border p-6 space-y-4">
+            <h3 className="font-semibold text-foreground">Your Details</h3>
+
             <div className="space-y-2">
               <label className="block text-sm font-medium text-foreground">Full Name</label>
               <input
@@ -151,7 +236,6 @@ export default function CheckoutModal() {
               />
             </div>
 
-            {/* Email */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-foreground">Email Address</label>
               <input
@@ -162,50 +246,55 @@ export default function CheckoutModal() {
                 placeholder="john@example.com"
                 className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
+              <p className="text-xs text-muted-foreground">
+                {selectedProduct === 'digital'
+                  ? 'Your download link will be sent here after purchase.'
+                  : 'Your order confirmation and tracking will be sent here.'}
+              </p>
             </div>
-
-            {/* Error Message */}
-            {error && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex items-center gap-3 bg-destructive/10 border border-destructive/30 rounded-lg p-4"
-              >
-                <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0" />
-                <p className="text-sm text-destructive">{error}</p>
-              </motion.div>
-            )}
-
-            {/* Payment Method Info */}
-            <div className="bg-background rounded-lg p-4 border border-border text-sm text-muted-foreground space-y-2">
-              <p className="font-semibold text-foreground text-sm">Mock Payment</p>
-              <p>This is a demo checkout. In production, this would integrate with Stripe/Shopify.</p>
-            </div>
-
-            {/* Submit Button */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              type="submit"
-              disabled={processing}
-              className="w-full py-4 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
-            >
-              {processing ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Processing Payment...
-                </>
-              ) : (
-                'Complete Purchase'
-              )}
-            </motion.button>
-          </form>
-
-          {/* Trust & Info */}
-          <div className="pt-6 border-t border-border space-y-2 text-center text-sm text-muted-foreground">
-            <p>🔒 Your data is secure and encrypted</p>
-            <p>💌 Confirmation email will be sent to your inbox</p>
           </div>
+
+          {/* Error */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex items-center gap-3 bg-destructive/10 border border-destructive/30 rounded-lg p-4"
+            >
+              <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0" />
+              <p className="text-sm text-destructive">{error}</p>
+            </motion.div>
+          )}
+
+          {/* Submit */}
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            type="submit"
+            disabled={processing}
+            className="w-full py-4 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+          >
+            {processing ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Creating Checkout...
+              </>
+            ) : (
+              `Continue to Payment — $${products.find(p => p.id === selectedProduct)?.price}`
+            )}
+          </motion.button>
+        </motion.form>
+
+        {/* Trust badges */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+          className="pt-6 border-t border-border space-y-2 text-center text-sm text-muted-foreground"
+        >
+          <p><Lock className="w-4 h-4 flex-shrink-0 inline" /> Secure checkout powered by Shopify</p>
+          <p><Heart className="w-4 h-4 flex-shrink-0 inline" /> Digital download emailed instantly after purchase</p>
+          <p><Truck className="w-4 h-4 flex-shrink-0 inline" /> Prints ship within 3–5 business days</p>
         </motion.div>
       </div>
     </motion.div>
