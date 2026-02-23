@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useUploadContext } from '@/lib/uploadContext';
 import { addWatermark, blobToDataUrl } from '@/lib/watermark';
-import { ChevronLeft, Loader2, Download, Printer, Frame, Check } from 'lucide-react';
+import { ChevronLeft, Loader2, Download, Printer, Frame, Check, Sparkles } from 'lucide-react';
 
 const POLL_INTERVAL_MS = 5000;
 const MAX_POLL_ATTEMPTS = 60; // 5 minutes max
@@ -34,17 +34,18 @@ export default function PreviewStep() {
   const products = [
     {
       id: 'digital',
-      name: 'Instant Masterpiece',
+      name: 'Instant Digital High-Res',
       price: 29,
       originalPrice: 49,
       icon: Download,
-      description: 'Instant high-resolution download – perfect for sharing or saving',
+      description: 'The digital masterpiece. Perfect for social media and DIY printing.',
       benefits: [
         'No Watermark',
-        'Instant Download',
-        'High-Resolution Format',
+        'Commercial License',
+        '8K Ultra-High Resolution',
       ],
-      buttonLabel: 'Download Now',
+      buttonLabel: 'Get Digital Copy',
+      highlighted: false,
     },
     {
       id: 'print',
@@ -52,32 +53,33 @@ export default function PreviewStep() {
       price: 89,
       originalPrice: 129,
       icon: Printer,
-      description: 'Printed on museum-quality archival paper with fade-resistant inks.',
+      description: 'Museum-quality archival paper with fade-resistant inks.',
       benefits: [
-        'Museum-quality archival paper',
-        'Fade-resistant inks',
-        'Made to last decades',
+        'Includes Digital Copy', // Upsell benefit
+        'Premium Matte Finish',
+        'Ships in 3-5 days',
       ],
-      buttonLabel: 'Order Print',
+      buttonLabel: 'Order Fine Art Print',
+      highlighted: false,
     },
     {
       id: 'canvas',
-      name: 'Large Canvas',
+      name: 'Gallery Canvas',
       price: 299,
       originalPrice: 399,
       icon: Frame,
-      description: 'Gallery-quality canvas on a 1.25″ thick frame – arrives ready to hang.',
+      description: 'Hand-stretched on a 1.25" wood frame. Arrives ready to hang.',
       benefits: [
-        'Ready to hang',
-        'Cotton-blend canvas, 1.25" thick',
-        'Mounting included',
+        'Includes Digital Copy', // Upsell benefit
+        'Life-time Warranty',
+        'Free Express Shipping',
       ],
-      buttonLabel: 'Order Canvas',
+      buttonLabel: 'Order Gallery Canvas',
       highlighted: true,
     },
   ];
 
-  // Convert File to base64 data URL
+  // (Keeping your existing logic functions: fileToBase64, pollStatus, useEffects, handleBack)
   const fileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -87,27 +89,20 @@ export default function PreviewStep() {
     });
   };
 
-  // Poll for face swap status
   const pollStatus = useCallback(async (reqId: string) => {
     if (pollCountRef.current >= MAX_POLL_ATTEMPTS) {
       setError('Generation timed out. Please try again.');
       setProcessing(false);
       return;
     }
-
     pollCountRef.current += 1;
-
     try {
       const res = await fetch('/api/face/status', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ request_id: reqId }),
       });
-
-      if (!res.ok) {
-        throw new Error(`Status check failed: ${res.statusText}`);
-      }
-
+      if (!res.ok) throw new Error(`Status check failed: ${res.statusText}`);
       const data = await res.json();
       const status = data.message?.status;
 
@@ -115,16 +110,11 @@ export default function PreviewStep() {
         const imageDataUrl = data.message.image_data_url;
         setGeneratedImageUrl(imageDataUrl);
         setStatusMessage('Applying watermark...');
-
-        // Fetch the image as a blob for watermarking
         const imgResponse = await fetch(imageDataUrl);
         const imgBlob = await imgResponse.blob();
         setGeneratedImage(imgBlob);
-
-        // Apply watermark for preview
         const watermarked = await addWatermark(imgBlob);
         setWatermarkedImage(watermarked);
-
         const wmUrl = await blobToDataUrl(watermarked);
         setPreviewUrl(wmUrl);
         setProcessing(false);
@@ -135,15 +125,8 @@ export default function PreviewStep() {
         setProcessing(false);
         return;
       }
-
-      // Update status message
-      if (status === 'Processing') {
-        setStatusMessage('AI is painting your portrait...');
-      } else if (status === 'Queued') {
-        setStatusMessage('Waiting in queue...');
-      }
-
-      // Schedule next poll
+      if (status === 'Processing') setStatusMessage('AI is painting your portrait...');
+      else if (status === 'Queued') setStatusMessage('Waiting in queue...');
       pollTimerRef.current = setTimeout(() => pollStatus(reqId), POLL_INTERVAL_MS);
     } catch (err) {
       console.error('[PreviewStep] Poll error:', err);
@@ -152,48 +135,29 @@ export default function PreviewStep() {
     }
   }, [setError, setProcessing, setGeneratedImage, setGeneratedImageUrl, setWatermarkedImage, setStep]);
 
-  // Submit image for face swap
   useEffect(() => {
     const submitImage = async () => {
       if (!uploadedImage || isSubmittedRef.current) return;
       isSubmittedRef.current = true;
-
       try {
         setProcessing(true);
         setError(null);
-
-        // Convert to base64
         const base64 = await fileToBase64(uploadedImage);
-
-        // Generate a session user ID
         const userId = `session-${Date.now()}-${Math.random().toString(36).substring(7)}`;
-
-        // Submit to face swap API
         const res = await fetch('/api/face/process', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            image: base64,
-            user_id: userId,
-          }),
+          body: JSON.stringify({ image: base64, user_id: userId }),
         });
-
         if (!res.ok) {
           const errData = await res.json();
           throw new Error(errData.error || 'Failed to submit image');
         }
-
         const data = await res.json();
         const reqId = data.message?.request_id;
-
-        if (!reqId) {
-          throw new Error('No request_id returned from API');
-        }
-
+        if (!reqId) throw new Error('No request_id returned from API');
         setRequestId(reqId);
         setStatusMessage('Waiting in queue...');
-
-        // Start polling
         pollCountRef.current = 0;
         pollTimerRef.current = setTimeout(() => pollStatus(reqId), POLL_INTERVAL_MS);
       } catch (err) {
@@ -202,17 +166,10 @@ export default function PreviewStep() {
         setProcessing(false);
       }
     };
-
     submitImage();
-
-    return () => {
-      if (pollTimerRef.current) {
-        clearTimeout(pollTimerRef.current);
-      }
-    };
+    return () => { if (pollTimerRef.current) clearTimeout(pollTimerRef.current); };
   }, [uploadedImage, setProcessing, setError, setRequestId, pollStatus]);
 
-  // If we already have a generated image (e.g., navigating back), show preview directly
   useEffect(() => {
     const showExistingPreview = async () => {
       if (generatedImage && !previewUrl && !processing) {
@@ -226,9 +183,7 @@ export default function PreviewStep() {
   }, [generatedImage, previewUrl, processing, setWatermarkedImage]);
 
   const handleBack = () => {
-    if (pollTimerRef.current) {
-      clearTimeout(pollTimerRef.current);
-    }
+    if (pollTimerRef.current) clearTimeout(pollTimerRef.current);
     localStorage.removeItem('noblified_request_id');
     setPreviewUrl(null);
     setRequestId(null);
@@ -236,37 +191,16 @@ export default function PreviewStep() {
     setStep('upload');
   };
 
-  const handlePurchase = () => {
-    setStep('checkout');
-  };
-
   if (processing && !previewUrl) {
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="min-h-screen bg-background flex items-center justify-center"
-      >
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-6">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-            className="flex justify-center"
-          >
+          <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: 'linear' }} className="flex justify-center">
             <Loader2 className="w-16 h-16 text-primary" />
           </motion.div>
           <div className="space-y-2">
-            <h2 className="font-serif text-3xl font-bold text-foreground">
-              Creating Your Masterpiece
-            </h2>
-            <p className="text-muted-foreground">
-              {statusMessage}
-            </p>
-            {requestId && (
-              <p className="text-xs text-muted-foreground/60 font-mono mt-4">
-                Request: {requestId}
-              </p>
-            )}
+            <h2 className="font-serif text-3xl font-bold text-foreground">Creating Your Masterpiece</h2>
+            <p className="text-muted-foreground">{statusMessage}</p>
           </div>
         </div>
       </motion.div>
@@ -280,169 +214,128 @@ export default function PreviewStep() {
       transition={{ duration: 0.5 }}
       className="min-h-screen bg-background py-12 px-4 md:px-8"
     >
-      <div className="max-w-3xl mx-auto space-y-8">
-        {/* Back Button */}
-        <motion.button
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.1 }}
-          onClick={handleBack}
-          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ChevronLeft className="w-5 h-5" />
-          Adjust
-        </motion.button>
-
-        {/* Preview */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-          className="space-y-4"
-        >
-          {previewUrl && (
-            <>
-              <div className="relative rounded-lg overflow-hidden bg-card border border-border">
-                <img
-                  src={previewUrl}
-                  alt="Your portrait"
-                  className="w-full h-auto"
-                />
-              </div>
-
-              {/* Free Preview Badge */}
-              <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground bg-card rounded-lg py-3 border border-border">
-                <span>
-                  Free preview · <span className="text-foreground font-semibold">Watermarked</span>
-                </span>
-              </div>
-            </>
-          )}
-        </motion.div>
-
-        {/* Quick Actions */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-          className="space-y-3"
-        >
-          <button
-            onClick={handlePurchase}
-            className="w-full py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors"
-          >
-            Download Unwatermarked
+      <div className="max-w-5xl mx-auto space-y-12">
+        {/* Header Area */}
+        <div className="flex items-center justify-between">
+          <button onClick={handleBack} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm font-medium">
+            <ChevronLeft className="w-4 h-4" />
+            Start Over
           </button>
-          <button
-            onClick={handleBack}
-            className="w-full py-3 border border-primary text-primary rounded-lg font-semibold hover:bg-primary/5 transition-colors"
-          >
-            Generate Another
-          </button>
-        </motion.div>
+          <div className="flex items-center gap-2 text-primary text-sm font-semibold italic">
+            <Sparkles className="w-4 h-4" />
+            AI Masterpiece Generated
+          </div>
+        </div>
 
-        {/* Divider */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.35 }}
-          className="py-8 border-t border-border"
-        />
+        {/* Main Grid: Preview on left (or top), Store on right (or bottom) */}
+        <div className="grid lg:grid-cols-12 gap-12 items-start">
 
-        {/* Product Options Section */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-          className="space-y-8"
-        >
-          {/* Section Title */}
-          <div className="text-center">
-            <h3 className="font-serif text-2xl font-bold text-foreground">
-              Or Choose Your Format
-            </h3>
-            <p className="text-sm text-muted-foreground mt-2">
-              Order a professionally printed or canvas version
-            </p>
+          {/* Left Side: Preview */}
+          <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-8">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2 }}
+              className="relative rounded-2xl overflow-hidden bg-card border-4 border-white shadow-2xl"
+            >
+              {previewUrl && (
+                <img src={previewUrl} alt="Your portrait" className="w-full h-auto" />
+              )}
+              <div className="absolute inset-0 pointer-events-none border border-black/5 rounded-2xl" />
+            </motion.div>
+
+            <div className="flex items-center justify-center gap-2 text-xs uppercase tracking-widest text-muted-foreground bg-card rounded-full py-2 border border-border">
+              <span>Preview Mode: <span className="text-foreground font-bold">Watermarked</span></span>
+            </div>
           </div>
 
-          {/* Products Grid */}
-          <div className="grid md:grid-cols-3 gap-6">
-            {products.map((product, index) => (
-              <motion.div
-                key={product.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className={`border rounded-lg p-6 transition-all text-center ${product.highlighted
-                  ? 'border-primary bg-primary/5 md:scale-105'
-                  : 'border-border hover:border-primary/50'
-                  }`}
-              >
-                {/* Icon */}
-                <div className="flex justify-center mb-4">
-                  <product.icon size={32} className="text-primary" />
-                </div>
+          {/* Right Side: Storefront */}
+          <div className="lg:col-span-7 space-y-8">
+            <div className="space-y-2">
+              <h3 className="font-serif text-3xl font-bold text-foreground">Own This Portrait</h3>
+              <p className="text-muted-foreground">Select a format to remove the watermark and unlock high-resolution files.</p>
+            </div>
 
-                {/* Title */}
-                <h4 className="font-serif text-lg font-bold text-foreground mb-2">
-                  {product.name}
-                </h4>
-
-                {/* Pricing */}
-                <div className="mb-3">
-                  <span className="text-2xl font-bold text-foreground">
-                    ${product.price}
-                  </span>
-                  <span className="text-xs line-through text-muted-foreground ml-2">
-                    ${product.originalPrice}
-                  </span>
-                </div>
-
-                {/* Description */}
-                <p className="text-xs text-muted-foreground mb-4 min-h-[40px]">
-                  {product.description}
-                </p>
-
-                {/* Benefits */}
-                <div className="space-y-1.5 mb-4">
-                  {product.benefits.map((benefit, idx) => (
-                    <div key={idx} className="flex items-center justify-center gap-2 text-xs text-foreground">
-                      <Check size={14} className="text-primary flex-shrink-0" />
-                      <span>{benefit}</span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* CTA Button */}
-                <button
+            <div className="grid gap-4">
+              {products.map((product, index) => (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 + (index * 0.1) }}
+                  className={`group relative border-2 rounded-xl p-5 cursor-pointer transition-all ${product.highlighted
+                      ? 'border-primary bg-primary/5 ring-4 ring-primary/10'
+                      : 'border-border hover:border-primary/40 bg-card'
+                    }`}
                   onClick={() => setStep('checkout')}
-                  className="w-full py-2.5 px-4 rounded-lg font-semibold text-sm transition-colors bg-primary text-primary-foreground hover:bg-primary/90"
                 >
-                  {product.buttonLabel}
-                </button>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+                  {product.highlighted && (
+                    <div className="absolute -top-3 right-6 bg-primary text-primary-foreground text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter">
+                      Best Value
+                    </div>
+                  )}
 
-        {/* Trust & Info */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-          className="grid grid-cols-2 gap-4 pt-12 border-t border-border"
-        >
-          <div className="text-center space-y-2">
-            <p className="text-2xl font-bold text-primary">1M+</p>
-            <p className="text-sm text-muted-foreground">Portraits Created</p>
+                  <div className="flex items-center gap-5">
+                    <div className={`p-3 rounded-lg ${product.highlighted ? 'bg-primary text-white' : 'bg-muted text-primary'}`}>
+                      <product.icon size={24} />
+                    </div>
+
+                    <div className="flex-1">
+                      <div className="flex items-baseline justify-between">
+                        <h4 className="font-bold text-lg text-foreground">{product.name}</h4>
+                        <div className="text-right">
+                          <span className="text-xl font-bold text-foreground">${product.price}</span>
+                          <span className="text-xs line-through text-muted-foreground ml-2">${product.originalPrice}</span>
+                        </div>
+                      </div>
+
+                      <p className="text-sm text-muted-foreground mb-3">{product.description}</p>
+
+                      <div className="flex flex-wrap gap-x-4 gap-y-1">
+                        {product.benefits.map((benefit, idx) => (
+                          <div key={idx} className="flex items-center gap-1.5 text-[11px] font-medium text-foreground/80">
+                            <Check size={12} className="text-primary" />
+                            {benefit}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <button className={`w-full mt-5 py-3 rounded-lg font-bold text-sm transition-all ${product.highlighted
+                      ? 'bg-primary text-primary-foreground hover:shadow-lg'
+                      : 'bg-foreground text-background hover:bg-foreground/90'
+                    }`}>
+                    {product.buttonLabel}
+                  </button>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Generate Another (De-emphasized) */}
+            <button
+              onClick={handleBack}
+              className="w-full py-4 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors border border-dashed border-border rounded-xl"
+            >
+              Not happy? Try another photo
+            </button>
           </div>
-          <div className="text-center space-y-2">
-            <p className="text-2xl font-bold text-primary">4.8★</p>
-            <p className="text-sm text-muted-foreground">TrustCaptain Rating</p>
-          </div>
-        </motion.div>
+        </div>
+
+        {/* Social Proof */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-12 border-t border-border">
+          {[
+            { label: 'Created', val: '1M+' },
+            { label: 'Rating', val: '4.8★' },
+            { label: 'Secure', val: 'SSL' },
+            { label: 'Privacy', val: '100%' },
+          ].map((stat, i) => (
+            <div key={i} className="text-center">
+              <p className="text-xl font-bold text-primary">{stat.val}</p>
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{stat.label}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </motion.div>
   );
