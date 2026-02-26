@@ -3,8 +3,8 @@
 import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useUploadContext } from '@/lib/uploadContext';
-import { Upload, AlertCircle } from 'lucide-react';
-import GalleryPreview from '@/components/gallery/GalleryPreview';
+import { Upload, AlertCircle, InfoIcon } from 'lucide-react';
+import CredibilitySection from '@/components/credibility/CredibilitySection';
 
 export default function UploadStep() {
   const { setUploadedImage, setStep, setError, error, style } = useUploadContext();
@@ -75,20 +75,20 @@ export default function UploadStep() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen bg-background py-12 px-4 md:px-8"
+      className="min-h-screen bg-background py-6 md:py-12 px-4 md:px-8"
     >
-      <div className="max-w-2xl mx-auto space-y-12">
+      <div className="max-w-2xl mx-auto space-y-6 md:space-y-12">
         {/* Hero Section */}
-        <div className="text-center space-y-4 pt-8">
+        <div className="text-center space-y-4 pt-4 md:pt-8">
           <motion.h2
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.5 }}
-            className="font-serif text-5xl md:text-6xl font-bold text-foreground italic"
+            className="font-serif text-4xl md:text-6xl font-bold text-foreground italic"
           >
-            Become A Timeless
+            Claim Your Rightful
             <br />
-            Masterpiece
+            Place in History.
           </motion.h2>
 
           <motion.p
@@ -97,7 +97,7 @@ export default function UploadStep() {
             transition={{ delay: 0.2, duration: 0.5 }}
             className="text-lg text-muted-foreground"
           >
-            Free preview · No credit card or registration required
+            See yourself as a timeless masterpiece. Free preview · No credit card required.
           </motion.p>
         </div>
 
@@ -110,7 +110,7 @@ export default function UploadStep() {
           onDragLeave={handleDrag}
           onDragOver={handleDrag}
           onDrop={handleDrop}
-          className={`relative border-2 border-dashed rounded-2xl p-12 text-center transition-colors cursor-pointer ${isDragActive
+          className={`relative border-2 border-dashed rounded-2xl p-6 md:p-12 text-center transition-colors cursor-pointer ${isDragActive
             ? 'border-primary bg-primary/5'
             : 'border-border hover:border-primary/50'
             }`}
@@ -144,10 +144,10 @@ export default function UploadStep() {
               </div>
               <div className="space-y-2">
                 <p className="text-base font-semibold text-foreground">
-                  Upload one or more photos – {style === 'humans' ? 'people and pets' : 'pets'} welcome.
+                  Upload your photos below. (Peasants, nobility, and pets are all welcome.)
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Each face clearly visible
+                  Ensure faces are clearly visible for the best results.
                 </p>
               </div>
             </div>
@@ -159,10 +159,10 @@ export default function UploadStep() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.5 }}
-          className="bg-card rounded-lg p-4 border border-border text-center text-sm text-muted-foreground"
+          className="bg-card rounded-lg p-4 border border-border text-center text-sm text-primary font-medium italic flex items-center justify-center"
         >
-          📝 Selected style: <span className="text-foreground font-semibold capitalize">{style}</span>
-          {' '}(toggle in header)
+          <InfoIcon className='mr-2' /> Subject: <span className="capitalize font-bold">{style}</span>
+          {' '}(Toggle in header to switch to {style === 'humans' ? 'Pets' : 'Humans'})
         </motion.div>
 
         {/* Error Message */}
@@ -184,9 +184,9 @@ export default function UploadStep() {
           transition={{ delay: 0.5, duration: 0.5 }}
           onClick={handleSubmit}
           disabled={!preview}
-          className="w-full py-4 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="w-full py-4 bg-primary text-primary-foreground rounded-lg font-bold text-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
         >
-          Generate My Portrait
+          Reveal My Masterpiece
         </motion.button>
 
         {/* Trust Section */}
@@ -194,7 +194,7 @@ export default function UploadStep() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.5 }}
-          className="text-center space-y-2 pt-8 border-t border-border"
+          className="text-center space-y-2 pt-6 md:pt-8 border-t border-border"
         >
           <div className="flex items-center justify-center gap-2">
             <p className="text-lg font-semibold text-foreground">Excellent</p>
@@ -211,8 +211,8 @@ export default function UploadStep() {
         </motion.div>
       </div>
 
-      {/* Gallery Preview */}
-      <GalleryPreview />
+      {/* Gallery/Credibility Preview */}
+      <CredibilitySection />
     </motion.div>
   );
 }

@@ -4,10 +4,23 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useUploadContext } from '@/lib/uploadContext';
 import { addWatermark, blobToDataUrl } from '@/lib/watermark';
-import { ChevronLeft, Loader2, Download, Printer, Frame, Check, Sparkles } from 'lucide-react';
+import { ChevronLeft, Loader2, Download, Printer, Frame, Check, Sparkles, Paintbrush, Landmark, Crown } from 'lucide-react';
 
 const POLL_INTERVAL_MS = 5000;
 const MAX_POLL_ATTEMPTS = 60; // 5 minutes max
+
+const FUNNY_MESSAGES = [
+  "Mixing the perfect shade of 'Royal Burgundy'...",
+  "Telling the AI to add more grandeur...",
+  "Consulting with 18th-century art critics...",
+  "Ensuring your wig is perfectly powdered...",
+  "Polishing the gold leaf on your virtual frame...",
+  "Bribing a court painter with digital treats...",
+  "Calculating the optimal level of smugness...",
+  "Sprinkling a dash of historical inaccuracy...",
+  "Adjusting the lighting to hide your peasant origins...",
+  "Summoning the spirit of Rembrandt...",
+];
 
 export default function PreviewStep() {
   const {
@@ -27,6 +40,7 @@ export default function PreviewStep() {
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState('Submitting your photo...');
+  const [messageIndex, setMessageIndex] = useState(0);
   const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pollCountRef = useRef(0);
   const isSubmittedRef = useRef(false);
@@ -125,7 +139,7 @@ export default function PreviewStep() {
         setProcessing(false);
         return;
       }
-      if (status === 'Processing') setStatusMessage('AI is painting your portrait...');
+      if (status === 'Processing') setStatusMessage(FUNNY_MESSAGES[messageIndex % FUNNY_MESSAGES.length]);
       else if (status === 'Queued') setStatusMessage('Waiting in queue...');
       pollTimerRef.current = setTimeout(() => pollStatus(reqId), POLL_INTERVAL_MS);
     } catch (err) {
@@ -169,6 +183,20 @@ export default function PreviewStep() {
     submitImage();
     return () => { if (pollTimerRef.current) clearTimeout(pollTimerRef.current); };
   }, [uploadedImage, setProcessing, setError, setRequestId, pollStatus]);
+
+  // Cycle through funny messages every few seconds while processing
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    if (processing && !previewUrl) {
+      interval = setInterval(() => {
+        setMessageIndex((prev) => prev + 1);
+        setStatusMessage(FUNNY_MESSAGES[(messageIndex + 1) % FUNNY_MESSAGES.length]);
+      }, 3500); // Change message every 3.5 seconds
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [processing, previewUrl, messageIndex]);
 
   useEffect(() => {
     const showExistingPreview = async () => {
@@ -251,74 +279,111 @@ export default function PreviewStep() {
 
           {/* Right Side: Storefront */}
           <div className="lg:col-span-7 space-y-8">
-            <div className="space-y-2">
-              <h3 className="font-serif text-3xl font-bold text-foreground">Own This Portrait</h3>
-              <p className="text-muted-foreground">Select a format to remove the watermark and unlock high-resolution files.</p>
+            <div className="space-y-4">
+              <h3 className="font-serif text-4xl font-bold text-foreground leading-tight">
+                Don't Just Save It.<br />Immortalize It.
+              </h3>
+              <p className="text-xl text-primary font-medium italic">Pixels are temporary. Oil paint lasts centuries.</p>
+
+              <div className="bg-card p-6 rounded-xl border border-border shadow-sm space-y-4">
+                <p className="text-muted-foreground leading-relaxed">
+                  You’ve seen the preview, now claim the masterpiece. Commission one of our master artists to bring your digital concept to life. <strong className="text-foreground">100% hand-painted using authentic oil paints on premium canvas</strong>—just like the royals did it.
+                </p>
+
+                <ul className="space-y-3 pt-2">
+                  <li className="flex items-start gap-3 text-sm">
+                    <Paintbrush className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-foreground block">Real Art, Real Artists</strong>
+                      <span className="text-muted-foreground">No digital printing. Every brushstroke is painted by hand.</span>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-3 text-sm">
+                    <Landmark className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-foreground block">Museum Quality</strong>
+                      <span className="text-muted-foreground">Rich, textured oil paints that look incredible on any wall.</span>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-3 text-sm">
+                    <Crown className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-foreground block">The Ultimate Heirloom</strong>
+                      <span className="text-muted-foreground">A timeless conversation piece guaranteed to outlast your hard drive.</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
             </div>
 
-            <div className="grid gap-4">
-              {products.map((product, index) => (
-                <motion.div
-                  key={product.id}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 + (index * 0.1) }}
-                  className={`group relative border-2 rounded-xl p-5 cursor-pointer transition-all ${product.highlighted
-                      ? 'border-primary bg-primary/5 ring-4 ring-primary/10'
-                      : 'border-border hover:border-primary/40 bg-card'
-                    }`}
-                  onClick={() => setStep('checkout')}
-                >
-                  {product.highlighted && (
-                    <div className="absolute -top-3 right-6 bg-primary text-primary-foreground text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter">
-                      Best Value
-                    </div>
-                  )}
+            {/* Options */}
+            <div className="space-y-6 pt-4">
+              {/* Primary Option: Canvas */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+                className="group relative border-2 border-primary bg-primary/5 ring-4 ring-primary/10 rounded-xl p-6 transition-all"
+              >
+                <div className="absolute -top-3 right-6 bg-primary text-primary-foreground text-xs font-bold px-4 py-1 rounded-full uppercase tracking-widest shadow-md">
+                  Premium Quality
+                </div>
 
-                  <div className="flex items-center gap-5">
-                    <div className={`p-3 rounded-lg ${product.highlighted ? 'bg-primary text-white' : 'bg-muted text-primary'}`}>
-                      <product.icon size={24} />
-                    </div>
-
-                    <div className="flex-1">
-                      <div className="flex items-baseline justify-between">
-                        <h4 className="font-bold text-lg text-foreground">{product.name}</h4>
-                        <div className="text-right">
-                          <span className="text-xl font-bold text-foreground">${product.price}</span>
-                          <span className="text-xs line-through text-muted-foreground ml-2">${product.originalPrice}</span>
-                        </div>
-                      </div>
-
-                      <p className="text-sm text-muted-foreground mb-3">{product.description}</p>
-
-                      <div className="flex flex-wrap gap-x-4 gap-y-1">
-                        {product.benefits.map((benefit, idx) => (
-                          <div key={idx} className="flex items-center gap-1.5 text-[11px] font-medium text-foreground/80">
-                            <Check size={12} className="text-primary" />
-                            {benefit}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+                <div className="flex gap-5">
+                  <div className="p-4 rounded-xl bg-primary text-primary-foreground h-fit shadow-inner">
+                    <Frame size={32} />
                   </div>
 
-                  <button className={`w-full mt-5 py-3 rounded-lg font-bold text-sm transition-all ${product.highlighted
-                      ? 'bg-primary text-primary-foreground hover:shadow-lg'
-                      : 'bg-foreground text-background hover:bg-foreground/90'
-                    }`}>
-                    {product.buttonLabel}
-                  </button>
-                </motion.div>
-              ))}
+                  <div className="flex-1 space-y-4">
+                    <div className="flex items-baseline justify-between border-b border-border/50 pb-4">
+                      <div>
+                        <h4 className="font-serif font-bold text-2xl text-foreground">Hand-Painted Oil Canvas</h4>
+                        <p className="text-sm font-medium text-muted-foreground mt-1">16x20in / 40x50cm</p>
+                      </div>
+                      <span className="text-3xl font-bold text-foreground">$299</span>
+                    </div>
+
+                    <div className="space-y-2 text-sm text-muted-foreground">
+                      <p className="flex items-start gap-2">
+                        <Check size={16} className="text-primary mt-0.5 shrink-0" />
+                        <span>Stretched on an <strong className="text-foreground">ornate gold frame</strong>.</span>
+                      </p>
+                      <p className="flex items-start gap-2 bg-secondary/30 p-3 rounded-lg mt-2">
+                        <span className="text-xl">⌛</span>
+                        <span><strong className="text-foreground">Please note:</strong> It takes approximately <strong className="text-foreground">1 month</strong> to meticulously paint, dry, frame, and ship your masterpiece.</span>
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => setStep('checkout')}
+                      className="w-full mt-2 py-4 rounded-lg font-bold text-base transition-all bg-primary text-primary-foreground hover:shadow-xl hover:bg-primary/90"
+                    >
+                      Commission Canvas
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Secondary Option: Digital */}
+              <div className="text-center pt-2">
+                <button
+                  onClick={() => setStep('checkout')}
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground underline underline-offset-4 transition-colors p-2"
+                >
+                  Or, download the digital file for $20.
+                </button>
+              </div>
             </div>
 
             {/* Generate Another (De-emphasized) */}
-            <button
-              onClick={handleBack}
-              className="w-full py-4 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors border border-dashed border-border rounded-xl"
-            >
-              Not happy? Try another photo
-            </button>
+            <div className="pt-4 border-t border-border">
+              <button
+                onClick={handleBack}
+                className="w-full py-4 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors border border-dashed border-border rounded-xl"
+              >
+                Not happy? Try another photo
+              </button>
+            </div>
           </div>
         </div>
 

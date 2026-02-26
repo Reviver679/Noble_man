@@ -7,7 +7,7 @@
 const SHOPIFY_STORE_DOMAIN = process.env.NEXT_PUBLIC_SHOP_DOMAIN;
 const SHOPIFY_STOREFRONT_TOKEN = process.env.NEXT_PUBLIC_STOREFRONT_TOKEN;
 const HD_VARIANT_ID = process.env.NEXT_DIGITAL_VARIENT_ID || '';
-const PRINT_VARIANT_ID = process.env.NEXT_PHYSICAL_PRINT_VARIENT_ID || '';
+const CANVAS_VARIANT_ID = process.env.NEXT_PHYSICAL_PRINT_VARIENT_ID || '';
 
 /**
  * Shopify GraphQL Query Interface
@@ -173,11 +173,11 @@ export const createShopifyCheckout = async (
  * @returns The Shopify checkout URL, or null on error
  */
 export const createCart = async (
-  productType: 'digital' | 'print',
+  productType: 'digital' | 'canvas',
   requestId: string
 ): Promise<string | null> => {
   const variantId =
-    productType === 'digital' ? HD_VARIANT_ID : PRINT_VARIANT_ID;
+    productType === 'digital' ? HD_VARIANT_ID : CANVAS_VARIANT_ID;
 
   if (!variantId) {
     console.error(`No variant ID configured for ${productType}`);

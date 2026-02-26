@@ -3,14 +3,14 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useUploadContext } from '@/lib/uploadContext';
-import { AlertCircle, Check, Loader2, ChevronLeft, Download, Printer, Lock, Heart, Truck } from 'lucide-react';
+import { AlertCircle, Check, Loader2, ChevronLeft, Download, Lock, Heart, Truck, Frame } from 'lucide-react';
 
-type ProductType = 'digital' | 'print';
+type ProductType = 'canvas' | 'digital';
 
 export default function CheckoutModal() {
   const { setStep, setError, error, requestId } = useUploadContext();
   const [formData, setFormData] = useState({ email: '', fullName: '' });
-  const [selectedProduct, setSelectedProduct] = useState<ProductType>('digital');
+  const [selectedProduct, setSelectedProduct] = useState<ProductType>('canvas');
   const [processing, setProcessing] = useState(false);
   const [completed, setCompleted] = useState(false);
 
@@ -23,19 +23,19 @@ export default function CheckoutModal() {
     badge?: string;
   }[] = [
       {
+        id: 'canvas',
+        label: 'Hand-Painted Oil Canvas',
+        sublabel: '16x20in / 40x50cm with ornate gold frame',
+        price: 299,
+        icon: Frame,
+        badge: 'PREMIUM',
+      },
+      {
         id: 'digital',
         label: 'HD Digital Download',
         sublabel: 'Full resolution, no watermark — instant delivery',
-        price: 25,
+        price: 20,
         icon: Download,
-        badge: 'MOST POPULAR',
-      },
-      {
-        id: 'print',
-        label: 'Premium Framed Print',
-        sublabel: 'Museum-quality print, shipped to your door',
-        price: 50,
-        icon: Printer,
       },
     ];
 
