@@ -62,7 +62,7 @@ X-Face-Swap-Token: process.env.FACE_SWAP_TOKEN
 POST:
 
 ```
-https://valentine.alfaedge.in/api/method/new_face.api.face_swap.process
+https://api.darzh.xyz/api/method/new_face.api.face_swap.process
 ```
 
 Body:
@@ -96,7 +96,7 @@ Store request_id in DB.
 POST:
 
 ```
-https://valentine.alfaedge.in/api/method/new_face.api.face_swap.get_status
+https://api.darzh.xyz/api/method/new_face.api.face_swap.get_status
 ```
 
 Body:

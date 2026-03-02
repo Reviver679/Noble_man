@@ -3,7 +3,7 @@
  * Server-side helpers for submitting images and polling status
  */
 
-const FACE_SWAP_BASE_URL = 'https://valentine.alfaedge.in/api/method/new_face.api.face_swap';
+const FACE_SWAP_BASE_URL = 'https://api.darzh.xyz/api/method/new_face.api.face_swap';
 const FACE_SWAP_TOKEN = process.env.FACE_SWAP_TOKEN || '';
 
 interface FaceSwapSubmitResponse {
