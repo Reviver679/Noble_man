@@ -11,7 +11,7 @@ services:
       - frappe_net
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.noble.rule=Host(`ai.noblified.com`)"
+      - "traefik.http.routers.noble.rule=Host(`ai.nobilified.com`)"
       - "traefik.http.routers.noble.entrypoints=websecure"
       - "traefik.http.routers.noble.tls=true"
       - "traefik.http.services.noble.loadbalancer.server.port=3000"
