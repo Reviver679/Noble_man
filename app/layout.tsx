@@ -31,6 +31,8 @@ export const metadata: Metadata = {
   },
 }
 
+const isDarkMode = false; // Internal variable to quickly switch between dark and light mode
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -38,7 +40,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased dark">
+      <body className={`font-sans antialiased ${isDarkMode ? 'dark' : ''}`}>
         {children}
         <Analytics />
       </body>

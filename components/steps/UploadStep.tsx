@@ -11,7 +11,7 @@ const MAX_FILES = 5;
 const MAX_FILE_SIZE_MB = 10;
 
 export default function UploadStep() {
-  const { setUploadedImages, setStep, setError, error } = useUploadContext();
+  const { setUploadedImages, setStep, setError, error, style } = useUploadContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isDragActive, setIsDragActive] = useState(false);
@@ -116,7 +116,7 @@ export default function UploadStep() {
       className="min-h-screen bg-background py-4 md:py-12 px-4 md:px-8"
     >
       <div className="max-w-2xl mx-auto space-y-4 md:space-y-12">
-        <PromptCarousel />
+        {/* <PromptCarousel /> */}
 
         {/* Hero Section */}
         <div className="text-center space-y-2 pt-2 md:pt-8">
@@ -151,8 +151,8 @@ export default function UploadStep() {
           onDragOver={handleDrag}
           onDrop={handleDrop}
           className={`relative border-2 border-dashed rounded-xl md:rounded-2xl p-4 md:p-8 text-center transition-colors ${isDragActive
-              ? 'border-primary bg-primary/5'
-              : 'border-border hover:border-primary/50'
+            ? 'border-primary bg-primary/5'
+            : 'border-border hover:border-primary/50'
             }`}
         >
           <input
@@ -192,7 +192,7 @@ export default function UploadStep() {
                       </button>
                     </motion.div>
                   ))}
-
+                  /store/hooleefakstore/settings
                   {previews.length < MAX_FILES && (
                     <motion.button
                       initial={{ opacity: 0 }}
@@ -230,6 +230,59 @@ export default function UploadStep() {
               </div>
             </div>
           )}
+        </motion.div>
+
+        {/* Subject Type Gallery */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+          className="space-y-6"
+        >
+          <AnimatePresence mode="wait">
+            {style === 'pets' && (
+              <motion.div
+                key="pet-gallery"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="grid grid-cols-3 gap-2 md:gap-4 max-w-lg mx-auto pb-4">
+                  <div className="aspect-[4/5] rounded-xl overflow-hidden shadow-sm border border-border">
+                    <img src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=1548&auto=format&fit=crop" alt="Dog" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="aspect-[4/5] rounded-xl overflow-hidden shadow-sm border border-border">
+                    <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=1443&auto=format&fit=crop" alt="Cat" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="aspect-[4/5] rounded-xl overflow-hidden shadow-sm border border-border">
+                    <img src="https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=1528&auto=format&fit=crop" alt="Dog 2" className="w-full h-full object-cover" />
+                  </div>
+                </div>
+              </motion.div>
+            )}
+            {style === 'humans' && (
+              <motion.div
+                key="human-gallery"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="grid grid-cols-3 gap-2 md:gap-4 max-w-lg mx-auto pb-4">
+                  <div className="aspect-[4/5] rounded-xl overflow-hidden shadow-sm border border-border">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1528&auto=format&fit=crop" alt="Human" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="aspect-[4/5] rounded-xl overflow-hidden shadow-sm border border-border">
+                    <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1287&auto=format&fit=crop" alt="Human 2" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="aspect-[4/5] rounded-xl overflow-hidden shadow-sm border border-border">
+                    <img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=1528&auto=format&fit=crop" alt="Human 3" className="w-full h-full object-cover" />
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
 
         {/* Error Message */}
