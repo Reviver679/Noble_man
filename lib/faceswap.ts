@@ -5,7 +5,7 @@
  * Supports 1–5 images per request (JSON body or multipart).
  */
 
-const FACE_SWAP_BASE_URL = 'https://api.darzh.xyz/api/method/new_face.api.face_swap';
+const FACE_SWAP_BASE_URL = 'https://api.nobilified.com/api/method/new_face.api.face_swap';
 
 function getToken(): string {
   const token = process.env.FACE_SWAP_TOKEN;

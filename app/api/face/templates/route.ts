@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const API_URL = 'https://api.darzh.xyz/api/method/get_prompt_templates';
+const API_URL = 'https://api.nobilified.com/api/method/get_prompt_templates';
 
 export async function GET() {
     try {
