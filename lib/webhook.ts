@@ -5,7 +5,7 @@
 
 import { createHmac } from 'crypto';
 
-const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET || '';
+const SHOPIFY_API_SECRET = process.env.NEXT_SHOPIFY_CLIENT_SECRET || process.env.SHOPIFY_API_SECRET || '';
 const DIGITAL_VARIANT_ID = process.env.NEXT_DIGITAL_VARIENT_ID || '';
 const PRINT_VARIANT_ID = process.env.NEXT_PHYSICAL_PRINT_VARIENT_ID || '';
 

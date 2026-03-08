@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useUploadContext } from '@/lib/uploadContext';
 import { Upload, AlertCircle, X, ImagePlus } from 'lucide-react';
 import CredibilitySection from '@/components/credibility/CredibilitySection';
-import PromptCarousel from '@/components/steps/PromptCarousel';
 
 const MAX_FILES = 5;
 const MAX_FILE_SIZE_MB = 10;
@@ -116,7 +115,6 @@ export default function UploadStep() {
       className="min-h-screen bg-background py-4 md:py-12 px-4 md:px-8"
     >
       <div className="max-w-2xl mx-auto space-y-4 md:space-y-12">
-        {/* <PromptCarousel /> */}
 
         {/* Hero Section */}
         <div className="text-center space-y-2 pt-2 md:pt-8">
@@ -232,6 +230,34 @@ export default function UploadStep() {
           )}
         </motion.div>
 
+        {/* Error Message */}
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="flex items-center gap-3 bg-destructive/10 border border-destructive/30 rounded-lg p-4 mt-4">
+                <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0" />
+                <p className="text-sm text-destructive">{error}</p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Submit Button */}
+        <motion.button
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+          onClick={handleSubmit}
+          disabled={files.length === 0}
+          className="w-full py-4 bg-primary text-primary-foreground rounded-lg font-bold text-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+        >
+          {files.length > 0 ? `Reveal My Masterpiece (${files.length})` : 'Reveal My Masterpiece'}
+        </motion.button>
         {/* Subject Type Gallery */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -262,57 +288,66 @@ export default function UploadStep() {
               </motion.div>
             )}
             {style === 'humans' && (
+              // <motion.div
+              //   key="human-gallery"
+              //   initial={{ opacity: 0, height: 0 }}
+              //   animate={{ opacity: 1, height: 'auto' }}
+              //   exit={{ opacity: 0, height: 0 }}
+              //   className="overflow-hidden"
+              // >
+              //   <div className="grid grid-cols-3 gap-2 md:gap-4 max-w-lg mx-auto pb-4">
+              //     <div className="aspect-[4/5] rounded-xl overflow-hidden shadow-sm border border-border">
+              //       <img src="/human1.png" alt="Human" className="w-full h-full object-cover" />
+              //     </div>
+              //     <div className="aspect-[4/5] rounded-xl overflow-hidden shadow-sm border border-border">
+              //       <img src="/human2.png" alt="Human 2" className="w-full h-full object-cover" />
+              //     </div>
+              //     <div className="aspect-[4/5] rounded-xl overflow-hidden shadow-sm border border-border">
+              //       <img src="/human3.png" alt="Human 3" className="w-full h-full object-cover" />
+              //     </div>
+              //   </div>
+              // </motion.div>
+
               <motion.div
-                key="human-gallery"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="overflow-hidden"
+                initial="hidden"
+                animate="show"
+                variants={{
+                  hidden: { opacity: 0 },
+                  show: {
+                    opacity: 1,
+                    transition: { staggerChildren: 0.15, delayChildren: 0.1 }
+                  }
+                }}
+                className="flex flex-row justify-center gap-3 sm:gap-6 md:gap-8 pt-4 pb-6 md:pb-8 "
               >
-                <div className="grid grid-cols-3 gap-2 md:gap-4 max-w-lg mx-auto pb-4">
-                  <div className="aspect-[4/5] rounded-xl overflow-hidden shadow-sm border border-border">
-                    <img src="/human1.png" alt="Human" className="w-full h-full object-cover" />
+                <motion.div variants={{ hidden: { opacity: 0, scale: 0.8, y: 10 }, show: { opacity: 1, scale: 1, y: 0, transition: { type: "spring", stiffness: 100 } } }} className="flex flex-col items-center text-center space-y-2 md:space-y-4 flex-1 max-w-[100px] sm:max-w-[140px] md:max-w-none">
+                  <div className="relative w-24 h-24 sm:w-32 sm:h-32 md:w-48 md:h-48 rounded-2xl overflow-hidden shadow-lg border-2 border-border/50 group">
+                    <img src="/upload.jpeg" alt="Upload Step" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    <div className="absolute top-1 left-1 md:top-2 md:left-2 bg-background/90 backdrop-blur-md w-5 h-5 md:w-8 md:h-8 rounded-full flex items-center justify-center font-bold font-serif text-primary shadow-sm border border-border/50 text-[10px] md:text-base">1</div>
                   </div>
-                  <div className="aspect-[4/5] rounded-xl overflow-hidden shadow-sm border border-border">
-                    <img src="/human2.png" alt="Human 2" className="w-full h-full object-cover" />
+                  <h3 className="font-bold text-xs sm:text-sm md:text-lg text-foreground leading-tight">Upload<br className="md:hidden" /> Photo</h3>
+                </motion.div>
+
+                <motion.div variants={{ hidden: { opacity: 0, scale: 0.8, y: 10 }, show: { opacity: 1, scale: 1, y: 0, transition: { type: "spring", stiffness: 100 } } }} className="flex flex-col items-center text-center space-y-2 md:space-y-4 flex-1 max-w-[100px] sm:max-w-[140px] md:max-w-none">
+                  <div className="relative w-24 h-24 sm:w-32 sm:h-32 md:w-48 md:h-48 rounded-2xl overflow-hidden shadow-lg border-2 border-border/50 group">
+                    <img src="/preview.jpeg" alt="Preview Step" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    <div className="absolute top-1 left-1 md:top-2 md:left-2 bg-background/90 backdrop-blur-md w-5 h-5 md:w-8 md:h-8 rounded-full flex items-center justify-center font-bold font-serif text-primary shadow-sm border border-border/50 text-[10px] md:text-base">2</div>
                   </div>
-                  <div className="aspect-[4/5] rounded-xl overflow-hidden shadow-sm border border-border">
-                    <img src="/human3.png" alt="Human 3" className="w-full h-full object-cover" />
+                  <h3 className="font-bold text-xs sm:text-sm md:text-lg text-foreground leading-tight">Digital<br className="md:hidden" /> Preview</h3>
+                </motion.div>
+
+                <motion.div variants={{ hidden: { opacity: 0, scale: 0.8, y: 10 }, show: { opacity: 1, scale: 1, y: 0, transition: { type: "spring", stiffness: 100 } } }} className="flex flex-col items-center text-center space-y-2 md:space-y-4 flex-1 max-w-[100px] sm:max-w-[140px] md:max-w-none">
+                  <div className="relative w-24 h-24 sm:w-32 sm:h-32 md:w-48 md:h-48 rounded-2xl overflow-hidden shadow-lg border-2 border-border/50 group">
+                    <img src="/painted.jpeg" alt="Painted Step" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    <div className="absolute top-1 left-1 md:top-2 md:left-2 bg-background/90 backdrop-blur-md w-5 h-5 md:w-8 md:h-8 rounded-full flex items-center justify-center font-bold font-serif text-primary shadow-sm border border-border/50 text-[10px] md:text-base">3</div>
                   </div>
-                </div>
+                  <h3 className="font-bold text-xs sm:text-sm md:text-lg text-foreground leading-tight">Hand<br className="md:hidden" /> Painted</h3>
+                </motion.div>
               </motion.div>
             )}
           </AnimatePresence>
         </motion.div>
 
-        {/* Error Message */}
-        <AnimatePresence>
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="overflow-hidden"
-            >
-              <div className="flex items-center gap-3 bg-destructive/10 border border-destructive/30 rounded-lg p-4 mt-4">
-                <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0" />
-                <p className="text-sm text-destructive">{error}</p>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Submit Button */}
-        <motion.button
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-          onClick={handleSubmit}
-          disabled={files.length === 0}
-          className="w-full py-4 bg-primary text-primary-foreground rounded-lg font-bold text-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
-        >
-          {files.length > 0 ? `Reveal My Masterpiece (${files.length})` : 'Reveal My Masterpiece'}
-        </motion.button>
 
         {/* Trust Section */}
         <motion.div

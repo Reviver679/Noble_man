@@ -343,7 +343,7 @@ export default function PreviewStep() {
 
             {/* Options */}
             <div className="space-y-6 pt-4">
-              {/* Primary Option: Canvas */}
+              {/* Digital File Option (First Position) */}
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -351,11 +351,57 @@ export default function PreviewStep() {
                 className="group relative border-2 border-primary bg-primary/5 ring-4 ring-primary/10 rounded-xl p-6 transition-all"
               >
                 <div className="absolute -top-3 right-6 bg-primary text-primary-foreground text-xs font-bold px-4 py-1 rounded-full uppercase tracking-widest shadow-md">
-                  Premium Quality
+                  Most Popular
                 </div>
 
                 <div className="flex gap-5">
                   <div className="p-4 rounded-xl bg-primary text-primary-foreground h-fit shadow-inner">
+                    <Download size={32} />
+                  </div>
+
+                  <div className="flex-1 space-y-4">
+                    <div className="flex items-baseline justify-between border-b border-border/50 pb-4">
+                      <div>
+                        <h4 className="font-serif font-bold text-2xl text-foreground">High-Res Digital Masterpiece</h4>
+                        <p className="text-sm font-medium text-muted-foreground mt-1">Ready to download instantly</p>
+                      </div>
+                      <span className="text-3xl font-bold text-foreground">$20</span>
+                    </div>
+
+                    <div className="space-y-2 text-sm text-muted-foreground">
+                      <p className="flex items-start gap-2">
+                        <Check size={16} className="text-primary mt-0.5 shrink-0" />
+                        <span>High-resolution, completely <strong className="text-foreground">watermark-free</strong>.</span>
+                      </p>
+                      <p className="flex items-start gap-2">
+                        <Check size={16} className="text-primary mt-0.5 shrink-0" />
+                        <span>Perfect for <strong className="text-foreground">social media</strong> or your own printing.</span>
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => setStep('checkout')}
+                      className="w-full mt-2 py-4 rounded-lg font-bold text-base transition-all bg-primary text-primary-foreground hover:shadow-xl hover:bg-primary/90"
+                    >
+                      Get Digital File
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Commission Canvas Option */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4 }}
+                className="group relative border-2 border-border bg-card rounded-xl p-6 transition-all hover:border-primary/50"
+              >
+                <div className="absolute -top-3 right-6 bg-muted text-muted-foreground text-xs font-bold px-4 py-1 rounded-full uppercase tracking-widest border border-border">
+                  Hand-Painted
+                </div>
+
+                <div className="flex gap-5">
+                  <div className="p-4 rounded-xl bg-secondary text-secondary-foreground h-fit">
                     <Frame size={32} />
                   </div>
 
@@ -381,23 +427,13 @@ export default function PreviewStep() {
 
                     <button
                       onClick={() => setStep('checkout')}
-                      className="w-full mt-2 py-4 rounded-lg font-bold text-base transition-all bg-primary text-primary-foreground hover:shadow-xl hover:bg-primary/90"
+                      className="w-full mt-2 py-4 rounded-lg font-bold text-base transition-all bg-secondary text-secondary-foreground hover:shadow-md hover:bg-secondary/80"
                     >
                       Commission Canvas
                     </button>
                   </div>
                 </div>
               </motion.div>
-
-              {/* Secondary Option: Digital */}
-              <div className="text-center pt-2">
-                <button
-                  onClick={() => setStep('checkout')}
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground underline underline-offset-4 transition-colors p-2"
-                >
-                  Or, download the digital file for $20.
-                </button>
-              </div>
             </div>
 
             {/* Generate Another (De-emphasized) */}
