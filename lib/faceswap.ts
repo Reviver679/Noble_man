@@ -5,7 +5,8 @@
  * Supports 1–5 images per request (JSON body or multipart).
  */
 
-const FACE_SWAP_BASE_URL = 'https://api.nobilified.com/api/method/new_face.api.face_swap';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://api.nobilified.com';
+const FACE_SWAP_BASE_URL = `${BACKEND_URL}/api/method/new_face.api.face_swap`;
 
 function getToken(): string {
   const token = process.env.FACE_SWAP_TOKEN;

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
-const API_URL = 'https://api.nobilified.com/api/method/get_prompt_templates';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://api.nobilified.com';
+const API_URL = `${BACKEND_URL}/api/method/get_prompt_templates`;
 
 export async function GET() {
     try {

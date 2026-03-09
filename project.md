@@ -44,6 +44,7 @@ FACE_SWAP_TOKEN=
 
 NEXT_SHOPIFY_CLIENT_ID=
 NEXT_SHOPIFY_CLIENT_SECRET=
+NEXT_PUBLIC_BACKEND_URL=
 ```
 
 ---
@@ -65,7 +66,7 @@ X-Face-Swap-Token: process.env.FACE_SWAP_TOKEN
 POST:
 
 ```
-https://api.nobilified.com/api/method/new_face.api.face_swap.process
+`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/method/new_face.api.face_swap.process`
 ```
 
 API accepts **1 to 5 images**. Backend rejects 0 or >5.
@@ -136,7 +137,7 @@ Store `request_id` in DB.
 POST:
 
 ```
-https://api.nobilified.com/api/method/new_face.api.face_swap.get_status
+`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/method/new_face.api.face_swap.get_status`
 ```
 
 Body:
