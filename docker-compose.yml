@@ -7,8 +7,6 @@ services:
     restart: always
     environment:
       - NODE_ENV=production
-    env_file:
-      - .env.local
     networks:
       - frappe_net
     labels:
