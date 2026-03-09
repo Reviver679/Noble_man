@@ -2,7 +2,6 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Enable pnpm via corepack
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 COPY package.json pnpm-lock.yaml ./
@@ -17,11 +16,10 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Copy standalone output
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
-COPY .env.local .env.local
-COPY /public /public
+COPY public ./public
+# COPY .env.local .env.local
 
 EXPOSE 3000
 
