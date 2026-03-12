@@ -3,11 +3,40 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUploadContext } from '@/lib/uploadContext';
-import { Upload, AlertCircle, X, ImagePlus } from 'lucide-react';
+import { Upload, AlertCircle, X, ImagePlus, Settings2 } from 'lucide-react';
 import CredibilitySection from '@/components/credibility/CredibilitySection';
+import StyleDrawer from './StyleDrawer';
 
 const MAX_FILES = 5;
 const MAX_FILE_SIZE_MB = 10;
+
+const GALLERY_CONTENT: Record<string, { step: string; title: string; sub: string; img: string }[]> = {
+  'Pet Portraits': [
+    { step: "I", title: "The Selection", sub: "Upload Photo", img: "/pet1.png" },
+    { step: "II", title: "The Vision", sub: "Digital Preview", img: "/pet2.png" },
+    { step: "III", title: "The Creation", sub: "Hand Painted", img: "/pet3.png" }
+  ],
+  'Family Portraits': [
+    { step: "I", title: "The Selection", sub: "Upload Photo", img: "/family1.jpeg" },
+    { step: "II", title: "The Vision", sub: "Digital Preview", img: "/family2.jpeg" },
+    { step: "III", title: "The Creation", sub: "Hand Painted", img: "/family3.jpeg" }
+  ],
+  "Children's Portraits": [
+    { step: "I", title: "The Selection", sub: "Upload Photo", img: "/human1.png" },
+    { step: "II", title: "The Vision", sub: "Digital Preview", img: "/children2.jpeg" },
+    { step: "III", title: "The Creation", sub: "Hand Painted", img: "/children3.jpeg" }
+  ],
+  'Couple Portraits': [
+    { step: "I", title: "The Selection", sub: "Upload Photo", img: "/couple1.jpeg" },
+    { step: "II", title: "The Vision", sub: "Digital Preview", img: "/couple2.jpeg" },
+    { step: "III", title: "The Creation", sub: "Hand Painted", img: "/couple3.jpeg" }
+  ],
+  'Self-Portraits': [
+    { step: "I", title: "The Selection", sub: "Upload Photo", img: "/upload.jpeg" },
+    { step: "II", title: "The Vision", sub: "Digital Preview", img: "/preview.jpeg" },
+    { step: "III", title: "The Creation", sub: "Hand Painted", img: "/painted.jpeg" }
+  ]
+};
 
 export default function UploadStep() {
   const { setUploadedImages, setStep, setError, error, style } = useUploadContext();
@@ -16,6 +45,7 @@ export default function UploadStep() {
   const [isDragActive, setIsDragActive] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const processFiles = (newFiles: File[]) => {
     setError(null);
@@ -258,120 +288,83 @@ export default function UploadStep() {
         >
           {files.length > 0 ? `Reveal My Masterpiece (${files.length})` : 'Reveal My Masterpiece'}
         </motion.button>
+        {/* <button
+          onClick={() => setIsDrawerOpen(true)}
+          className="opacity-10 hover:opacity-100 transition-opacity"
+          aria-label="Style Settings"
+        >
+          <Settings2 size={12} className="text-muted-foreground" />
+        </button> */}
         {/* Subject Type Gallery */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.5 }}
           className="space-y-6"
+          onClick={() => setIsDrawerOpen(true)}
         >
           <AnimatePresence mode="wait">
-            {style === 'pets' && (
-              <motion.div
-                key="pet-gallery"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="overflow-hidden"
-              >
-                <div className="grid grid-cols-3 gap-2 md:gap-4 max-w-lg mx-auto pb-4">
-                  <div className="aspect-[4/5] rounded-xl overflow-hidden shadow-sm border border-border">
-                    <img src="/pet1.png" alt="Dog" className="w-full h-full object-cover" />
-                  </div>
-                  <div className="aspect-[4/5] rounded-xl overflow-hidden shadow-sm border border-border">
-                    <img src="/pet2.png" alt="Cat" className="w-full h-full object-cover" />
-                  </div>
-                  <div className="aspect-[4/5] rounded-xl overflow-hidden shadow-sm border border-border">
-                    <img src="/pet3.png" alt="Dog 2" className="w-full h-full object-cover" />
-                  </div>
-                </div>
-              </motion.div>
-            )}
-            {style === 'humans' && (
-              // <motion.div
-              //   key="human-gallery"
-              //   initial={{ opacity: 0, height: 0 }}
-              //   animate={{ opacity: 1, height: 'auto' }}
-              //   exit={{ opacity: 0, height: 0 }}
-              //   className="overflow-hidden"
-              // >
-              //   <div className="grid grid-cols-3 gap-2 md:gap-4 max-w-lg mx-auto pb-4">
-              //     <div className="aspect-[4/5] rounded-xl overflow-hidden shadow-sm border border-border">
-              //       <img src="/human1.png" alt="Human" className="w-full h-full object-cover" />
-              //     </div>
-              //     <div className="aspect-[4/5] rounded-xl overflow-hidden shadow-sm border border-border">
-              //       <img src="/human2.png" alt="Human 2" className="w-full h-full object-cover" />
-              //     </div>
-              //     <div className="aspect-[4/5] rounded-xl overflow-hidden shadow-sm border border-border">
-              //       <img src="/human3.png" alt="Human 3" className="w-full h-full object-cover" />
-              //     </div>
-              //   </div>
-              // </motion.div>
+            <motion.div
+              key={style || 'default'}
+              initial="hidden"
+              animate="show"
+              exit={{ opacity: 0, y: -20, transition: { duration: 0.3 } }}
+              variants={{
+                hidden: { opacity: 0 },
+                show: {
+                  opacity: 1,
+                  transition: { staggerChildren: 0.2, delayChildren: 0.1 }
+                }
+              }}
+              className="flex flex-row justify-center gap-4 sm:gap-8 md:gap-12 pt-10 pb-12"
+            >
+              {(GALLERY_CONTENT[style] || GALLERY_CONTENT['Self-Portraits']).map((item, index) => (
+                <motion.div
+                  key={index}
+                  variants={{
+                    hidden: { opacity: 0, y: 30 },
+                    show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } }
+                  }}
+                  className="flex flex-col items-center text-center group flex-1 max-w-[110px] sm:max-w-[160px] md:max-w-[280px]"
+                >
+                  {/* The Frame: Architectural & Sharp */}
+                  <div className="relative mb-8 transition-transform duration-700 group-hover:-translate-y-2 rounded-md">
+                    {/* Layered Accent Border (The "Matting") */}
+                    <div className="absolute -inset-2 border border-accent/30 scale-95 group-hover:scale-100 transition-transform duration-700 opacity-0 group-hover:opacity-100" />
 
-              <motion.div
-                initial="hidden"
-                animate="show"
-                variants={{
-                  hidden: { opacity: 0 },
-                  show: {
-                    opacity: 1,
-                    transition: { staggerChildren: 0.2, delayChildren: 0.1 }
-                  }
-                }}
-                className="flex flex-row justify-center gap-4 sm:gap-8 md:gap-12 pt-10 pb-12"
-              >
-                {[
-                  { step: "I", title: "The Selection", sub: "Upload Photo", img: "/upload.jpeg" },
-                  { step: "II", title: "The Vision", sub: "Digital Preview", img: "/preview.jpeg" },
-                  { step: "III", title: "The Creation", sub: "Hand Painted", img: "/painted.jpeg" }
-                ].map((item, index) => (
-                  <motion.div
-                    key={index}
-                    variants={{
-                      hidden: { opacity: 0, y: 30 },
-                      show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } }
-                    }}
-                    className="flex flex-col items-center text-center group flex-1 max-w-[110px] sm:max-w-[160px] md:max-w-[280px]"
-                  >
-                    {/* The Frame: Architectural & Sharp */}
-                    <div className="relative mb-8 transition-transform duration-700 group-hover:-translate-y-2 rounded-md">
-                      {/* Layered Accent Border (The "Matting") */}
-                      <div className="absolute -inset-2 border border-accent/30 scale-95 group-hover:scale-100 transition-transform duration-700 opacity-0 group-hover:opacity-100" />
+                    <div className=" rounded-md relative w-24 h-32 sm:w-40 sm:h-52 md:w-64 md:h-80 bg-muted overflow-hidden border border-border shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
+                      <img
+                        src={item.img}
+                        alt={item.title}
+                        className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-110"
+                      />
 
-                      <div className=" rounded-md relative w-24 h-32 sm:w-40 sm:h-52 md:w-64 md:h-80 bg-muted overflow-hidden border border-border shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
-                        <img
-                          src={item.img}
-                          alt={item.title}
-                          className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-110"
-                        />
+                      {/* Elegant Vignette Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60 group-hover:opacity-20 transition-opacity duration-700" />
 
-                        {/* Elegant Vignette Overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60 group-hover:opacity-20 transition-opacity duration-700" />
-
-                        {/* Roman Numeral Label */}
-                        <div className="absolute bottom-0 right-0 bg-primary px-3 py-1 md:px-5 md:py-2 text-primary-foreground font-serif text-[10px] md:text-sm tracking-[0.3em]">
-                          {item.step}
-                        </div>
+                      {/* Roman Numeral Label */}
+                      <div className="absolute bottom-0 right-0 bg-primary px-3 py-1 md:px-5 md:py-2 text-primary-foreground font-serif text-[10px] md:text-sm tracking-[0.3em]">
+                        {item.step}
                       </div>
                     </div>
+                  </div>
 
-                    {/* Typography: Noble Serif Hierarchy */}
-                    <div className="space-y-2 px-2">
-                      <h4 className="uppercase tracking-[0.25em] text-[7px] md:text-[10px] text-accent font-medium">
-                        Phase {item.step}
-                      </h4>
-                      <h3 className="font-serif text-sm sm:text-xl md:text-3xl text-foreground font-light leading-none">
-                        {item.title}
-                      </h3>
-                      <div className="h-px w-6 bg-border mx-auto my-3 group-hover:w-16 transition-all duration-700" />
-                      <p className="text-[9px] md:text-[11px] text-muted-foreground uppercase tracking-[0.15em] font-sans">
-                        {item.sub}
-                      </p>
-                    </div>
-                  </motion.div>
-                ))}
-              </motion.div>
-            )}
+                  {/* Typography: Noble Serif Hierarchy */}
+                  <div className="space-y-2 px-2">
+                    <h4 className="uppercase tracking-[0.25em] text-[7px] md:text-[10px] text-accent font-medium">
+                      Phase {item.step}
+                    </h4>
+                    <h3 className="font-serif text-sm sm:text-xl md:text-3xl text-foreground font-light leading-none">
+                      {item.title}
+                    </h3>
+                    <div className="h-px w-6 bg-border mx-auto my-3 group-hover:w-16 transition-all duration-700" />
+                    <p className="text-[9px] md:text-[11px] text-muted-foreground uppercase tracking-[0.15em] font-sans">
+                      {item.sub}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
           </AnimatePresence>
         </motion.div>
 
@@ -381,7 +374,7 @@ export default function UploadStep() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.5 }}
-          className="text-center space-y-2 pt-6 md:pt-8 border-t border-border"
+          className="text-center space-y-2 pt-6 md:pt-8 border-t border-border relative"
         >
           <div className="flex items-center justify-center gap-2">
             <p className="text-lg font-semibold text-foreground">Excellent</p>
@@ -392,12 +385,15 @@ export default function UploadStep() {
                 </svg>
               ))}
             </div>
-            <span className="text-muted-foreground text-sm">TrustCaptain</span>
+            <span className="text-muted-foreground text-sm cursor-default flex items-center gap-2">
+              TrustCaptain
+            </span>
           </div>
           <p className="text-sm text-muted-foreground">Over 1 million portraits made</p>
         </motion.div>
       </div>
 
+      <StyleDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
       <CredibilitySection />
     </motion.div>
   );

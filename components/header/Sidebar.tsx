@@ -1,9 +1,15 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Home, User, ShoppingBag, Info, Mail } from 'lucide-react';
+import { 
+  X, Home, User, Info, MessageSquare, 
+  FileText, Palette, DollarSign, LogIn, ChevronDown, 
+  ChevronUp, PawPrint, Users, Baby, Heart, ShoppingBag
+} from 'lucide-react';
 import Link from 'next/link';
+import { useUploadContext, StyleType } from '@/lib/uploadContext';
+import { useRouter } from 'next/navigation';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -11,6 +17,11 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
+  const { setStyle, style } = useUploadContext();
+  const [isCreateOpen, setIsCreateOpen] = useState(true);
+  const [isPoliciesOpen, setIsPoliciesOpen] = useState(false);
+  const router = useRouter();
+
   // Prevent scrolling when sidebar is open
   useEffect(() => {
     if (isOpen) {
@@ -23,12 +34,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     };
   }, [isOpen]);
 
-  const navItems = [
-    { label: 'Home', icon: <Home size={20} />, href: '/' },
-    { label: 'Cart', icon: <ShoppingBag size={20} />, href: '/cart' },
-    { label: 'About Us', icon: <Info size={20} />, href: '/about' },
-    { label: 'Contact', icon: <Mail size={20} />, href: 'mailto:admin@nobilified.com' },
-  ];
+  const handleCreateSelect = (selectedStyle: StyleType) => {
+    setStyle(selectedStyle);
+    router.push('/');
+    onClose();
+  };
 
   return (
     <AnimatePresence>
@@ -54,12 +64,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-border">
               <div className="flex flex-col">
-                <h2 className="font-serif text-xl font-bold text-foreground leading-none">
-                  Nobilified
-                </h2>
-                <p className="font-serif text-[10px] italic text-primary mt-1">
-                  Menu
-                </p>
+                <span className="text-sm font-semibold text-muted-foreground">Navigation</span>
               </div>
               <button
                 onClick={onClose}
@@ -71,20 +76,122 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             </div>
 
             {/* Navigation Links */}
-            <div className="flex-1 overflow-y-auto py-6 px-4 space-y-2">
-              {navItems.map((item, index) => (
+            <div className="flex-1 overflow-y-auto py-2">
+              
+              <div className="px-4 py-2 space-y-1 border-b border-border pb-6">
                 <Link
-                  key={index}
-                  href={item.href}
+                  href="/"
                   onClick={onClose}
                   className="flex items-center gap-4 px-4 py-3 text-foreground hover:bg-secondary/50 rounded-xl transition-colors group"
                 >
-                  <div className="text-muted-foreground group-hover:text-primary transition-colors">
-                    {item.icon}
-                  </div>
-                  <span className="font-medium">{item.label}</span>
+                  <Home size={20} className="text-muted-foreground group-hover:text-primary transition-colors" />
+                  <span className="font-medium">Home</span>
                 </Link>
-              ))}
+
+                {/* Create Accordion */}
+                <div className="flex flex-col">
+                  <button
+                    onClick={() => setIsCreateOpen(!isCreateOpen)}
+                    className="flex items-center justify-between px-4 py-3 text-foreground hover:bg-secondary/50 rounded-xl transition-colors group w-full"
+                  >
+                    <div className="flex items-center gap-4">
+                      <Palette size={20} className="text-muted-foreground group-hover:text-primary transition-colors" />
+                      <span className="font-medium">Create</span>
+                    </div>
+                    {isCreateOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  </button>
+
+                  <AnimatePresence>
+                    {isCreateOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden ml-10 space-y-1 mt-1"
+                      >
+                        <button
+                          onClick={() => handleCreateSelect('Pet Portraits')}
+                          className={`flex items-center gap-3 px-4 py-2.5 w-full text-left rounded-lg transition-colors ${style === 'Pet Portraits' ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-secondary/30'}`}
+                        >
+                          <PawPrint size={18} />
+                          <span className="text-sm font-medium">Pet Portraits</span>
+                        </button>
+                        <button
+                          onClick={() => handleCreateSelect('Family Portraits')}
+                          className={`flex items-center gap-3 px-4 py-2.5 w-full text-left rounded-lg transition-colors ${style === 'Family Portraits' ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-secondary/30'}`}
+                        >
+                          <Users size={18} />
+                          <span className="text-sm font-medium">Family Portraits</span>
+                        </button>
+                        <button
+                          onClick={() => handleCreateSelect('Children\'s Portraits')}
+                          className={`flex items-center gap-3 px-4 py-2.5 w-full text-left rounded-lg transition-colors ${style === 'Children\'s Portraits' ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-secondary/30'}`}
+                        >
+                          <Baby size={18} />
+                          <span className="text-sm font-medium">Children's Portraits</span>
+                        </button>
+                        <button
+                          onClick={() => handleCreateSelect('Couple Portraits')}
+                          className={`flex items-center gap-3 px-4 py-2.5 w-full text-left rounded-lg transition-colors ${style === 'Couple Portraits' ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-secondary/30'}`}
+                        >
+                          <Heart size={18} />
+                          <span className="text-sm font-medium">Couple Portraits</span>
+                        </button>
+                        <button
+                          onClick={() => handleCreateSelect('Self-Portraits')}
+                          className={`flex items-center gap-3 px-4 py-2.5 w-full text-left rounded-lg transition-colors ${style === 'Self-Portraits' ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-secondary/30'}`}
+                        >
+                          <User size={18} />
+                          <span className="text-sm font-medium">Self-Portraits</span>
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                <Link
+                  href="/pricing"
+                  onClick={onClose}
+                  className="flex items-center gap-4 px-4 py-3 text-foreground hover:bg-secondary/50 rounded-xl transition-colors group"
+                >
+                  <DollarSign size={20} className="text-muted-foreground group-hover:text-primary transition-colors" />
+                  <span className="font-medium">Pricing</span>
+                </Link>
+
+                <Link
+                  href="/cart"
+                  onClick={onClose}
+                  className="flex items-center gap-4 px-4 py-3 text-foreground hover:bg-secondary/50 rounded-xl transition-colors group"
+                >
+                  <ShoppingBag size={20} className="text-muted-foreground group-hover:text-primary transition-colors" />
+                  <span className="font-medium">Cart</span>
+                </Link>
+              </div>
+
+              {/* Legal & Support */}
+              <div className="px-4 py-6 space-y-1">
+                <span className="px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 block">
+                  Legal & Support
+                </span>
+                
+                <Link
+                  href="/about"
+                  onClick={onClose}
+                  className="flex items-center gap-4 px-4 py-3 text-foreground hover:bg-secondary/50 rounded-xl transition-colors group"
+                >
+                  <Info size={20} className="text-muted-foreground group-hover:text-primary transition-colors" />
+                  <span className="font-medium">About Nobilified</span>
+                </Link>
+
+                <Link
+                  href="/support"
+                  onClick={onClose}
+                  className="flex items-center gap-4 px-4 py-3 text-foreground hover:bg-secondary/50 rounded-xl transition-colors group"
+                >
+                  <MessageSquare size={20} className="text-muted-foreground group-hover:text-primary transition-colors" />
+                  <span className="font-medium">Get Support</span>
+                </Link>
+              </div>
             </div>
 
             {/* Footer */}

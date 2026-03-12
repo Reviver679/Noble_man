@@ -10,7 +10,7 @@ export default function Header() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Breadcrumb labels
-  const stepLabels = ['Upload', 'Preview Your Painting', 'Claim Your Canvas'];
+  const stepLabels = ['Upload', 'Preview', 'Download/Order Painting'];
   const currentStepIndex = step === 'generating' ? 1 : step === 'preview' ? 1 : step === 'checkout' ? 2 : step === 'success' ? 2 : 0;
 
   return (
@@ -38,8 +38,8 @@ export default function Header() {
             {/* Style Toggle - Center */}
             <div className="flex items-center gap-1 bg-card rounded-full px-1.5 py-1.5 border border-border">
               <button
-                onClick={() => setStyle('humans')}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors flex items-center gap-1.5 ${style === 'humans'
+                onClick={() => setStyle('Self-Portraits')}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors flex items-center gap-1.5 ${style !== 'Pet Portraits'
                   ? 'bg-primary text-primary-foreground'
                   : 'text-foreground hover:bg-secondary'
                   }`}
@@ -48,8 +48,8 @@ export default function Header() {
                 Humans
               </button>
               <button
-                onClick={() => setStyle('pets')}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors flex items-center gap-1.5 ${style === 'pets'
+                onClick={() => setStyle('Pet Portraits')}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors flex items-center gap-1.5 ${style === 'Pet Portraits'
                   ? 'bg-primary text-primary-foreground'
                   : 'text-foreground hover:bg-secondary'
                   }`}
@@ -60,7 +60,7 @@ export default function Header() {
             </div>
 
             {/* Hamburger - Right */}
-            <button 
+            <button
               onClick={() => setIsSidebarOpen(true)}
               className="p-2 hover:bg-secondary rounded-lg transition-colors"
             >

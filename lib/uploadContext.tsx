@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export type UploadStep = 'upload' | 'generating' | 'preview' | 'checkout' | 'success';
-export type StyleType = 'humans' | 'pets';
+export type StyleType = 'Pet Portraits' | 'Family Portraits' | 'Children\'s Portraits' | 'Couple Portraits' | 'Self-Portraits';
 
 export interface PurchaseData {
   email: string;
@@ -56,7 +56,7 @@ export function UploadProvider({ children }: { children: ReactNode }) {
   const [watermarkedImage, setWatermarkedImage] = useState<Blob | null>(null);
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
   const [requestId, setRequestId] = useState<string | null>(null);
-  const [style, setStyle] = useState<StyleType>('humans');
+  const [style, setStyle] = useState<StyleType>('Self-Portraits');
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [purchaseData, setPurchaseData] = useState<PurchaseData | null>(null);
@@ -80,7 +80,7 @@ export function UploadProvider({ children }: { children: ReactNode }) {
     setWatermarkedImage(null);
     setGeneratedImageUrl(null);
     setRequestId(null);
-    setStyle('humans');
+    setStyle('Self-Portraits');
     setProcessing(false);
     setError(null);
     setPurchaseData(null);
