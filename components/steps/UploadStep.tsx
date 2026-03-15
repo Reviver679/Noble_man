@@ -3,7 +3,7 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUploadContext } from '@/lib/uploadContext';
-import { Upload, AlertCircle, X, ImagePlus, Settings2 } from 'lucide-react';
+import { Upload, AlertCircle, X, ImagePlus, Settings2, Loader2 } from 'lucide-react';
 import CredibilitySection from '@/components/credibility/CredibilitySection';
 import StyleDrawer from './StyleDrawer';
 
@@ -129,12 +129,44 @@ export default function UploadStep() {
     }
   };
 
-  const handleSubmit = () => {
+  const [isCheckingLimit, setIsCheckingLimit] = useState(false);
+
+  const handleSubmit = async () => {
     if (files.length === 0) {
       setError('Please select at least one image first');
       return;
     }
-    setStep('generating');
+
+    try {
+      setIsCheckingLimit(true);
+      setError(null);
+      const res = await fetch('/api/face/rate-limit', { method: 'POST' });
+      const data = await res.json();
+
+      if (!res.ok) {
+          throw new Error(data.error || 'Failed to check rate limits');
+      }
+
+      const limitStatus = data.message;
+      if (limitStatus && !limitStatus.can_generate) {
+        if (limitStatus.errors && limitStatus.errors.length > 0) {
+          // Display the first blocking error message
+          setError(limitStatus.errors[0].message);
+        } else {
+          setError('Rate limit reached. Please try again later.');
+        }
+        return;
+      }
+
+      setStep('generating');
+    } catch (err) {
+      console.error('Rate limit check failed:', err);
+      // Fallback: continue to generating if rate limit check itself fails, 
+      // the backend process route will also enforce it.
+      setStep('generating');
+    } finally {
+      setIsCheckingLimit(false);
+    }
   };
 
   return (
@@ -283,10 +315,19 @@ export default function UploadStep() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.5 }}
           onClick={handleSubmit}
-          disabled={files.length === 0}
+          disabled={files.length === 0 || isCheckingLimit}
           className="w-full py-4 bg-primary text-primary-foreground rounded-lg font-bold text-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
         >
-          {files.length > 0 ? `Reveal My Masterpiece (${files.length})` : 'Reveal My Masterpiece'}
+          {isCheckingLimit ? (
+              <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Checking availability...
+              </>
+          ) : files.length > 0 ? (
+              `Reveal My Masterpiece (${files.length})`
+          ) : (
+              'Reveal My Masterpiece'
+          )}
         </motion.button>
         {/* <button
           onClick={() => setIsDrawerOpen(true)}

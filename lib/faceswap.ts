@@ -5,6 +5,8 @@
  * Supports 1–5 images per request (JSON body or multipart).
  */
 
+import { NextRequest } from 'next/server';
+
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://api.nobilified.com';
 const FACE_SWAP_BASE_URL = `${BACKEND_URL}/api/method/new_face.api.face_swap`;
 
@@ -17,6 +19,13 @@ function getToken(): string {
     );
   }
   return token;
+}
+
+export function getClientIp(req: NextRequest): string {
+  const forwarded = req.headers.get('x-forwarded-for');
+  if (forwarded) return forwarded.split(',')[0].trim();
+  // Next 13/14 NextRequest has an 'ip' property in edge runtime, we cast as any to satisfy TS
+  return req.headers.get('x-real-ip') || (req as any).ip || '0.0.0.0';
 }
 
 // ---------------------------------------------------------------------------
@@ -60,6 +69,19 @@ export interface FaceSwapSubmitOptions {
 // Submit (JSON body — recommended)
 // ---------------------------------------------------------------------------
 
+export async function checkRateLimits(clientIp: string) {
+  const res = await fetch(
+    `${FACE_SWAP_BASE_URL}.rate_limit_status`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ client_ip: clientIp }),
+    }
+  );
+  const data = await res.json();
+  return data.message;
+}
+
 /**
  * Submit one or more images to the Face Swap API.
  *
@@ -70,6 +92,7 @@ export interface FaceSwapSubmitOptions {
 export async function submitFaceSwap(
   images: string | string[],
   userId: string,
+  clientIp: string,
   opts: FaceSwapSubmitOptions = {}
 ): Promise<FaceSwapSubmitResponse> {
   const token = getToken();
@@ -88,6 +111,7 @@ export async function submitFaceSwap(
   const body: Record<string, unknown> = {
     ...imagePayload,
     user_id: userId,
+    client_ip: clientIp,
     customer_name: opts.customerName ?? '',
     customer_email: opts.customerEmail ?? '',
   };
@@ -105,8 +129,30 @@ export async function submitFaceSwap(
   });
 
   if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`[faceswap] Process API error (${response.status}): ${text}`);
+    let errorMessage = `[faceswap] Process API error (${response.status})`;
+    try {
+        const errJson = await response.clone().json();
+        if (errJson._server_messages) {
+            // Parse escaped string array if applicable e.g "[\"Message\"]"
+            try {
+                const parsed = JSON.parse(errJson._server_messages);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    errorMessage = parsed[0];
+                } else {
+                    errorMessage = errJson._server_messages;
+                }
+            } catch {
+                errorMessage = errJson._server_messages;
+            }
+        } else if (errJson.error) {
+            errorMessage = errJson.error;
+        } else {
+            errorMessage += `: ${await response.text()}`;
+        }
+    } catch {
+        errorMessage += `: ${await response.text()}`;
+    }
+    throw new Error(errorMessage);
   }
 
   const data = await response.json();
@@ -130,6 +176,7 @@ export async function submitFaceSwap(
 export async function submitFaceSwapMultipart(
   files: File[] | Blob[],
   userId: string,
+  clientIp: string,
   opts: FaceSwapSubmitOptions = {}
 ): Promise<FaceSwapSubmitResponse> {
   const token = getToken();
@@ -140,6 +187,7 @@ export async function submitFaceSwapMultipart(
 
   const formData = new FormData();
   formData.append('user_id', userId);
+  formData.append('client_ip', clientIp);
   if (opts.customerName) formData.append('customer_name', opts.customerName);
   if (opts.customerEmail) formData.append('customer_email', opts.customerEmail);
   if (opts.callbackUrl) formData.append('callback_url', opts.callbackUrl);
@@ -160,8 +208,29 @@ export async function submitFaceSwapMultipart(
   });
 
   if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`[faceswap] Multipart process API error (${response.status}): ${text}`);
+    let errorMessage = `[faceswap] Multipart process API error (${response.status})`;
+    try {
+        const errJson = await response.clone().json();
+        if (errJson._server_messages) {
+            try {
+                const parsed = JSON.parse(errJson._server_messages);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    errorMessage = parsed[0];
+                } else {
+                    errorMessage = errJson._server_messages;
+                }
+            } catch {
+                errorMessage = errJson._server_messages;
+            }
+        } else if (errJson.error) {
+            errorMessage = errJson.error;
+        } else {
+            errorMessage += `: ${await response.text()}`;
+        }
+    } catch {
+        errorMessage += `: ${await response.text()}`;
+    }
+    throw new Error(errorMessage);
   }
 
   const data = await response.json();

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { submitFaceSwap, submitFaceSwapMultipart } from '@/lib/faceswap';
+import { submitFaceSwap, submitFaceSwapMultipart, getClientIp } from '@/lib/faceswap';
 
 /** Strip data URL prefix if present, e.g. "data:image/png;base64,<data>" → "<data>" */
 function stripDataUrlPrefix(s: string): string {
@@ -8,6 +8,7 @@ function stripDataUrlPrefix(s: string): string {
 
 export async function POST(request: NextRequest) {
     try {
+        const clientIp = getClientIp(request);
         const contentType = request.headers.get('content-type') ?? '';
 
         // ------------------------------------------------------------------
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
                 );
             }
 
-            const result = await submitFaceSwapMultipart(allFiles, userId, {
+            const result = await submitFaceSwapMultipart(allFiles, userId, clientIp, {
                 customerName: formData.get('customer_name') as string | undefined ?? undefined,
                 customerEmail: formData.get('customer_email') as string | undefined ?? undefined,
                 callbackUrl: formData.get('callback_url') as string | undefined ?? undefined,
@@ -82,7 +83,7 @@ export async function POST(request: NextRequest) {
         // Strip any data URL prefixes the client may have included
         const cleanImages = imageArray.map(stripDataUrlPrefix);
 
-        const result = await submitFaceSwap(cleanImages, user_id, {
+        const result = await submitFaceSwap(cleanImages, user_id, clientIp, {
             customerName: customer_name || undefined,
             customerEmail: customer_email || undefined,
             callbackUrl: callback_url || undefined,
