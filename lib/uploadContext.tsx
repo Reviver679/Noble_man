@@ -12,6 +12,8 @@ export interface PurchaseData {
   orderId: string;
 }
 
+export type SelectedProductType = 'canvas' | 'digital';
+
 export interface UploadContextType {
   step: UploadStep;
   /** Single file kept for backward-compat (first item of uploadedImages) */
@@ -29,6 +31,8 @@ export interface UploadContextType {
   prompt: string;
   /** Name of a Prompt Template on the backend (empty string = use backend default) */
   promptTemplate: string;
+  /** The product the user selected in PreviewStep ('canvas' | 'digital') */
+  selectedProduct: SelectedProductType;
 
   // Actions
   setStep: (step: UploadStep) => void;
@@ -44,6 +48,7 @@ export interface UploadContextType {
   setPurchaseData: (data: PurchaseData | null) => void;
   setPrompt: (prompt: string) => void;
   setPromptTemplate: (template: string) => void;
+  setSelectedProduct: (product: SelectedProductType) => void;
   reset: () => void;
 }
 
@@ -62,6 +67,7 @@ export function UploadProvider({ children }: { children: ReactNode }) {
   const [purchaseData, setPurchaseData] = useState<PurchaseData | null>(null);
   const [prompt, setPrompt] = useState<string>('baroque');
   const [promptTemplate, setPromptTemplate] = useState<string>('');
+  const [selectedProduct, setSelectedProduct] = useState<SelectedProductType>('digital');
 
   /** Set an array of uploaded images; also keeps uploadedImage in sync */
   const setUploadedImages = (files: File[]) => {
@@ -86,6 +92,7 @@ export function UploadProvider({ children }: { children: ReactNode }) {
     setPurchaseData(null);
     setPrompt('baroque');
     setPromptTemplate('');
+    setSelectedProduct('digital');
   };
 
   const value: UploadContextType = {
@@ -102,6 +109,7 @@ export function UploadProvider({ children }: { children: ReactNode }) {
     purchaseData,
     prompt,
     promptTemplate,
+    selectedProduct,
     setStep,
     setUploadedImage,
     setUploadedImages,
@@ -115,6 +123,7 @@ export function UploadProvider({ children }: { children: ReactNode }) {
     setPurchaseData,
     setPrompt,
     setPromptTemplate,
+    setSelectedProduct,
     reset,
   };
 

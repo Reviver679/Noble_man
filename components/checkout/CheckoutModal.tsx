@@ -2,20 +2,18 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useUploadContext } from '@/lib/uploadContext';
+import { useUploadContext, type SelectedProductType } from '@/lib/uploadContext';
 import { AlertCircle, Check, Loader2, ChevronLeft, Download, Lock, Heart, Truck, Frame } from 'lucide-react';
 
-type ProductType = 'canvas' | 'digital';
 
 export default function CheckoutModal() {
-  const { setStep, setError, error, requestId } = useUploadContext();
+  const { setStep, setError, error, requestId, selectedProduct, setSelectedProduct } = useUploadContext();
   const [formData, setFormData] = useState({ email: '', fullName: '' });
-  const [selectedProduct, setSelectedProduct] = useState<ProductType>('canvas');
   const [processing, setProcessing] = useState(false);
   const [completed, setCompleted] = useState(false);
 
   const products: {
-    id: ProductType;
+    id: SelectedProductType;
     label: string;
     sublabel: string;
     price: number;

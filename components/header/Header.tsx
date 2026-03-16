@@ -1,24 +1,59 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useUploadContext, type UploadStep } from '@/lib/uploadContext';
-import { Menu, User, PawPrint } from 'lucide-react';
+import { Menu, User, PawPrint, AlertTriangle } from 'lucide-react';
 import Sidebar from './Sidebar';
 
 export default function Header() {
   const { step, style, setStyle } = useUploadContext();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [rateLimitedMsg, setRateLimitedMsg] = useState<string | null>(null);
+
+  // Poll rate limit once on mount
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/api/face/rate-limit', { method: 'POST' });
+        const data = await res.json();
+        const status = data.message;
+        if (status && !status.can_generate) {
+          const msg =
+            status.errors && status.errors.length > 0
+              ? status.errors.map((e: { message: string }) => e.message).join('  ·  ')
+              : 'Generation is temporarily unavailable. Please try again later.';
+          setRateLimitedMsg(msg);
+        }
+      } catch {
+        // silently fail — don't block the UI
+      }
+    })();
+  }, []);
 
   // Breadcrumb labels
   const stepLabels = ['Upload', 'Preview', 'Download/Order Painting'];
   const currentStepIndex = step === 'generating' ? 1 : step === 'preview' ? 1 : step === 'checkout' ? 2 : step === 'success' ? 2 : 0;
 
   return (
-    <header className="sticky top-0 z-50 w-full">
-      {/* Top banner */}
-      {/* <div className="bg-white text-black py-2 px-4 text-center text-xs md:text-sm font-medium">
-        Free Shipping on Oil Paintings | #1 on TrustCaptain
-      </div> */}
+    <header className="sticky top-0 z-50 w-full bg-white">
+
+      {/* Rate-limit marquee banner */}
+      {/* Rate-limit marquee banner */}
+      {rateLimitedMsg && (
+        <div className="bg-secondary/40 border-b border-border py-2 overflow-hidden">
+          <div className="marquee-track flex whitespace-nowrap gap-16 animate-marquee">
+            {[...Array(4)].map((_, i) => (
+              <span
+                key={i}
+                className="inline-flex items-center gap-2 text-xs text-muted-foreground font-medium shrink-0"
+              >
+                <AlertTriangle size={12} className="opacity-60 shrink-0" />
+                {rateLimitedMsg}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Main header */}
       <div className="bg-background border-b border-border px-4 md:px-8 py-6">
@@ -27,12 +62,14 @@ export default function Header() {
           <div className="flex items-center justify-between mb-6">
             {/* Logo - Left */}
             <div className="flex flex-col">
-              <h1 className="font-serif text-xl md:text-2xl font-bold text-foreground leading-none">
+              {/* Logo image */}
+              <img src="/nobilified.png" alt="Nobilified" className="h-8 md:h-10 w-auto object-contain" />
+              {/* <h1 className="font-serif text-xl md:text-2xl font-bold text-foreground leading-none">
                 Nobilified
               </h1>
               <p className="font-serif text-[10px] md:text-xs italic text-primary mt-1">
                 Hand-painted Royalty
-              </p>
+              </p> */}
             </div>
 
             {/* Style Toggle - Center */}

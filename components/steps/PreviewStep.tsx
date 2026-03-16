@@ -3,11 +3,14 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useUploadContext } from '@/lib/uploadContext';
-import { addWatermark, blobToDataUrl } from '@/lib/watermark';
+import { blobToDataUrl } from '@/lib/watermark';
 import { ChevronLeft, Loader2, Download, Printer, Frame, Check, Sparkles, Paintbrush, Landmark, Crown } from 'lucide-react';
 
 const POLL_INTERVAL_MS = 5000;
-const MAX_POLL_ATTEMPTS = 60; // 5 minutes max
+// 20 minutes max (240 × 5 s). Only hard-stops on 'Failed' from the API.
+const MAX_POLL_ATTEMPTS = 240;
+// Transient network/server errors are retried with backoff up to this many times
+const MAX_CONSECUTIVE_ERRORS = 10;
 
 const FUNNY_MESSAGES = [
   "Mixing the perfect shade of 'Royal Burgundy'...",
@@ -37,6 +40,7 @@ export default function PreviewStep() {
     setError,
     setProcessing,
     processing,
+    setSelectedProduct,
   } = useUploadContext();
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -44,6 +48,7 @@ export default function PreviewStep() {
   const [messageIndex, setMessageIndex] = useState(0);
   const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pollCountRef = useRef(0);
+  const consecutiveErrorsRef = useRef(0);
   const isSubmittedRef = useRef(false);
 
   const products = [
@@ -94,23 +99,40 @@ export default function PreviewStep() {
     },
   ];
 
-  // Helper: convert File to base64 and strip the data URL prefix
+  // Helper: compress File to base64 and strip the data URL prefix
   const fileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string;
-        // Strip data:image/png;base64, prefix if present
-        resolve(result.includes(',') ? result.split(',')[1] : result);
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_DIM = 1200;
+        let { width, height } = img;
+        if (width > height) {
+          if (width > MAX_DIM) {
+            height = Math.round(height * (MAX_DIM / width));
+            width = MAX_DIM;
+          }
+        } else {
+          if (height > MAX_DIM) {
+            width = Math.round(width * (MAX_DIM / height));
+            height = MAX_DIM;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+        resolve(dataUrl.includes(',') ? dataUrl.split(',')[1] : dataUrl);
       };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
+      img.onerror = reject;
+      img.src = URL.createObjectURL(file);
     });
   };
 
   const pollStatus = useCallback(async (reqId: string) => {
     if (pollCountRef.current >= MAX_POLL_ATTEMPTS) {
-      setError('Generation timed out. Please try again.');
+      setError('Generation is taking longer than expected. Please try again.');
       setProcessing(false);
       return;
     }
@@ -121,21 +143,32 @@ export default function PreviewStep() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ request_id: reqId }),
       });
-      if (!res.ok) throw new Error(`Status check failed: ${res.statusText}`);
+
+      // On non-OK HTTP, treat as transient unless it's a hard 4xx (bad request etc.)
+      if (!res.ok) {
+        if (res.status >= 400 && res.status < 500) {
+          // Hard client error — don't keep hammering
+          throw new Error(`Status check failed: ${res.statusText}`);
+        }
+        // 5xx / network-level — count as transient
+        throw Object.assign(new Error(`Transient error: ${res.statusText}`), { transient: true });
+      }
+
       const data = await res.json();
       const status = data.message?.status;
+
+      // Reset consecutive error counter on a successful response
+      consecutiveErrorsRef.current = 0;
 
       if (status === 'Completed') {
         const imageDataUrl = data.message.image_data_url;
         setGeneratedImageUrl(imageDataUrl);
-        setStatusMessage('Applying watermark...');
+        setStatusMessage('Finishing up...');
         const imgResponse = await fetch(imageDataUrl);
         const imgBlob = await imgResponse.blob();
         setGeneratedImage(imgBlob);
-        const watermarked = await addWatermark(imgBlob);
-        setWatermarkedImage(watermarked);
-        const wmUrl = await blobToDataUrl(watermarked);
-        setPreviewUrl(wmUrl);
+        setWatermarkedImage(imgBlob);
+        setPreviewUrl(imageDataUrl);
 
         // Save to cart local storage
         try {
@@ -146,29 +179,39 @@ export default function PreviewStep() {
           };
           const history = JSON.parse(localStorage.getItem('nobilified_cart') || '[]');
           if (!history.some((h: any) => h.id === reqId)) {
-            // Keep up to 20 items to prevent quota issues even with URLs
             localStorage.setItem('nobilified_cart', JSON.stringify([newGen, ...history].slice(0, 20)));
           }
         } catch (e) {
-          console.error("Failed to save to cart", e);
+          console.error('Failed to save to cart', e);
         }
 
         setProcessing(false);
         setStep('preview');
         return;
       } else if (status === 'Failed') {
-        // Look for the corrected error_message field from the API
+        // Hard stop — the backend explicitly says it failed
         setError(data.message?.error_message || data.message?.error || 'Portrait generation failed. Please try again.');
         setProcessing(false);
         return;
       }
+
       if (status === 'Processing') setStatusMessage(FUNNY_MESSAGES[messageIndex % FUNNY_MESSAGES.length]);
       else if (status === 'Queued') setStatusMessage('Waiting in queue...');
       pollTimerRef.current = setTimeout(() => pollStatus(reqId), POLL_INTERVAL_MS);
-    } catch (err) {
-      console.error('[PreviewStep] Poll error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to check status');
-      setProcessing(false);
+    } catch (err: any) {
+      const isTransient = err?.transient === true || err instanceof TypeError; // TypeError = network failure
+      consecutiveErrorsRef.current += 1;
+      console.warn(`[PreviewStep] Poll error (${consecutiveErrorsRef.current}/${MAX_CONSECUTIVE_ERRORS}):`, err);
+
+      if (isTransient && consecutiveErrorsRef.current < MAX_CONSECUTIVE_ERRORS) {
+        // Exponential backoff: 5 s, 10 s, 20 s … capped at 60 s
+        const backoff = Math.min(POLL_INTERVAL_MS * 2 ** (consecutiveErrorsRef.current - 1), 60_000);
+        setStatusMessage('Connection hiccup — retrying...');
+        pollTimerRef.current = setTimeout(() => pollStatus(reqId), backoff);
+      } else {
+        setError(err instanceof Error ? err.message : 'Failed to check generation status');
+        setProcessing(false);
+      }
     }
   }, [setError, setProcessing, setGeneratedImage, setGeneratedImageUrl, setWatermarkedImage, setStep]);
 
@@ -252,9 +295,8 @@ export default function PreviewStep() {
   useEffect(() => {
     const showExistingPreview = async () => {
       if (generatedImage && !previewUrl && !processing) {
-        const watermarked = await addWatermark(generatedImage);
-        setWatermarkedImage(watermarked);
-        const url = await blobToDataUrl(watermarked);
+        setWatermarkedImage(generatedImage);
+        const url = await blobToDataUrl(generatedImage);
         setPreviewUrl(url);
       }
     };
@@ -278,9 +320,9 @@ export default function PreviewStep() {
           <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: 'linear' }} className="flex justify-center">
             <Loader2 className="w-16 h-16 text-primary" />
           </motion.div>
-          <div className="space-y-2">
+          <div className="space-y-2 px-4">
             <h2 className="font-serif text-3xl font-bold text-foreground">Creating Your Masterpiece</h2>
-            <p className="text-muted-foreground">{statusMessage}</p>
+            <p className="text-muted-foreground max-w-md mx-auto leading-relaxed">{statusMessage}</p>
           </div>
         </div>
       </motion.div>
@@ -325,7 +367,7 @@ export default function PreviewStep() {
             </motion.div>
 
             <div className="flex items-center justify-center gap-2 text-xs uppercase tracking-widest text-muted-foreground bg-card rounded-full py-2 border border-border">
-              <span>Preview Mode: <span className="text-foreground font-bold">Watermarked</span></span>
+              <span>Preview Mode: <span className="text-foreground font-bold">Unwatermarked</span></span>
             </div>
           </div>
 
@@ -407,7 +449,7 @@ export default function PreviewStep() {
                     </div>
 
                     <button
-                      onClick={() => setStep('checkout')}
+                      onClick={() => { setSelectedProduct('digital'); setStep('checkout'); }}
                       className="w-full mt-2 py-4 rounded-lg font-bold text-base transition-all bg-primary text-primary-foreground hover:shadow-xl hover:bg-primary/90"
                     >
                       Get Digital File
@@ -453,7 +495,7 @@ export default function PreviewStep() {
                     </div>
 
                     <button
-                      onClick={() => setStep('checkout')}
+                      onClick={() => { setSelectedProduct('canvas'); setStep('checkout'); }}
                       className="w-full mt-2 py-4 rounded-lg font-bold text-base transition-all bg-secondary text-secondary-foreground hover:shadow-md hover:bg-secondary/80"
                     >
                       Commission Canvas

@@ -23,23 +23,25 @@ export default function SplashScreen({ onComplete }: { onComplete: () => void })
                 transition={{ duration: 1, ease: 'easeOut' }}
                 className="flex flex-col items-center"
             >
-                <span className="font-serif text-5xl md:text-7xl font-bold text-foreground leading-none italic">
+                {/* Logo image */}
+                <img src="/nobilified.png" alt="Nobilified" className="h-20 md:h-28 w-auto object-contain" />
+                {/* <span className="font-serif text-5xl md:text-7xl font-bold text-foreground leading-none italic">
                     Nobilified
-                </span>
+                </span> */}
                 <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: '100%' }}
                     transition={{ delay: 0.5, duration: 1, ease: 'easeInOut' }}
                     className="h-[2px] bg-primary mt-4"
                 />
-                <motion.p
+                {/* <motion.p
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.7, duration: 0.8 }}
                     className="font-serif text-sm md:text-base italic text-primary mt-2"
                 >
                     Hand-painted Royalty
-                </motion.p>
+                </motion.p> */}
             </motion.div>
         </motion.div>
     );

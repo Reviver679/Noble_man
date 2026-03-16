@@ -12,29 +12,24 @@ const MAX_FILE_SIZE_MB = 10;
 
 const GALLERY_CONTENT: Record<string, { step: string; title: string; sub: string; img: string }[]> = {
   'Pet Portraits': [
-    { step: "I", title: "The Selection", sub: "Upload Photo", img: "/pet1.png" },
-    { step: "II", title: "The Vision", sub: "Digital Preview", img: "/pet2.png" },
-    { step: "III", title: "The Creation", sub: "Hand Painted", img: "/pet3.png" }
+    { step: "I", title: "The Selection", sub: "Upload Photo", img: "/pet1.jpeg" },
+    { step: "II", title: "The Creation", sub: "Hand Painted", img: "/pet3.jpeg" }
   ],
   'Family Portraits': [
     { step: "I", title: "The Selection", sub: "Upload Photo", img: "/family1.jpeg" },
-    { step: "II", title: "The Vision", sub: "Digital Preview", img: "/family2.jpeg" },
-    { step: "III", title: "The Creation", sub: "Hand Painted", img: "/family3.jpeg" }
+    { step: "II", title: "The Creation", sub: "Hand Painted", img: "/family3.jpeg" }
   ],
   "Children's Portraits": [
-    { step: "I", title: "The Selection", sub: "Upload Photo", img: "/human1.png" },
-    { step: "II", title: "The Vision", sub: "Digital Preview", img: "/children2.jpeg" },
-    { step: "III", title: "The Creation", sub: "Hand Painted", img: "/children3.jpeg" }
+    { step: "I", title: "The Selection", sub: "Upload Photo", img: "/chilldren.jpeg" },
+    { step: "II", title: "The Creation", sub: "Hand Painted", img: "/children3.jpeg" }
   ],
   'Couple Portraits': [
     { step: "I", title: "The Selection", sub: "Upload Photo", img: "/couple1.jpeg" },
-    { step: "II", title: "The Vision", sub: "Digital Preview", img: "/couple2.jpeg" },
-    { step: "III", title: "The Creation", sub: "Hand Painted", img: "/couple3.jpeg" }
+    { step: "II", title: "The Creation", sub: "Hand Painted", img: "/couple3.jpeg" }
   ],
   'Self-Portraits': [
-    { step: "I", title: "The Selection", sub: "Upload Photo", img: "/upload.jpeg" },
-    { step: "II", title: "The Vision", sub: "Digital Preview", img: "/preview.jpeg" },
-    { step: "III", title: "The Creation", sub: "Hand Painted", img: "/painted.jpeg" }
+    { step: "I", title: "The Selection", sub: "Upload Photo", img: "/human3.jpeg" },
+    { step: "II", title: "The Creation", sub: "Hand Painted", img: "/preview.jpeg" }
   ]
 };
 
@@ -144,7 +139,7 @@ export default function UploadStep() {
       const data = await res.json();
 
       if (!res.ok) {
-          throw new Error(data.error || 'Failed to check rate limits');
+        throw new Error(data.error || 'Failed to check rate limits');
       }
 
       const limitStatus = data.message;
@@ -319,14 +314,14 @@ export default function UploadStep() {
           className="w-full py-4 bg-primary text-primary-foreground rounded-lg font-bold text-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
         >
           {isCheckingLimit ? (
-              <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Checking availability...
-              </>
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              Checking availability...
+            </>
           ) : files.length > 0 ? (
-              `Reveal My Masterpiece (${files.length})`
+            `Reveal My Masterpiece (${files.length})`
           ) : (
-              'Reveal My Masterpiece'
+            'Reveal My Masterpiece'
           )}
         </motion.button>
         {/* <button
@@ -366,14 +361,14 @@ export default function UploadStep() {
                     hidden: { opacity: 0, y: 30 },
                     show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } }
                   }}
-                  className="flex flex-col items-center text-center group flex-1 max-w-[110px] sm:max-w-[160px] md:max-w-[280px]"
+                  className="flex flex-col items-center text-center group flex-1 max-w-[140px] sm:max-w-[200px] md:max-w-[340px]"
                 >
                   {/* The Frame: Architectural & Sharp */}
-                  <div className="relative mb-8 transition-transform duration-700 group-hover:-translate-y-2 rounded-md">
+                  <div className="relative transition-transform duration-700 group-hover:-translate-y-2 rounded-md">
                     {/* Layered Accent Border (The "Matting") */}
                     <div className="absolute -inset-2 border border-accent/30 scale-95 group-hover:scale-100 transition-transform duration-700 opacity-0 group-hover:opacity-100" />
 
-                    <div className=" rounded-md relative w-24 h-32 sm:w-40 sm:h-52 md:w-64 md:h-80 bg-muted overflow-hidden border border-border shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
+                    <div className="rounded-md relative w-36 h-48 sm:w-52 sm:h-72 md:w-80 md:h-[26rem] bg-muted overflow-hidden border border-border shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
                       <img
                         src={item.img}
                         alt={item.title}
@@ -382,26 +377,7 @@ export default function UploadStep() {
 
                       {/* Elegant Vignette Overlay */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60 group-hover:opacity-20 transition-opacity duration-700" />
-
-                      {/* Roman Numeral Label */}
-                      <div className="absolute bottom-0 right-0 bg-primary px-3 py-1 md:px-5 md:py-2 text-primary-foreground font-serif text-[10px] md:text-sm tracking-[0.3em]">
-                        {item.step}
-                      </div>
                     </div>
-                  </div>
-
-                  {/* Typography: Noble Serif Hierarchy */}
-                  <div className="space-y-2 px-2">
-                    <h4 className="uppercase tracking-[0.25em] text-[7px] md:text-[10px] text-accent font-medium">
-                      Phase {item.step}
-                    </h4>
-                    <h3 className="font-serif text-sm sm:text-xl md:text-3xl text-foreground font-light leading-none">
-                      {item.title}
-                    </h3>
-                    <div className="h-px w-6 bg-border mx-auto my-3 group-hover:w-16 transition-all duration-700" />
-                    <p className="text-[9px] md:text-[11px] text-muted-foreground uppercase tracking-[0.15em] font-sans">
-                      {item.sub}
-                    </p>
                   </div>
                 </motion.div>
               ))}
@@ -415,10 +391,9 @@ export default function UploadStep() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.5 }}
-          className="text-center space-y-2 pt-6 md:pt-8 border-t border-border relative"
+          className="text-center space-y-2 p-6 md:p-8 border-t border-border relative"
         >
           <div className="flex items-center justify-center gap-2">
-            <p className="text-lg font-semibold text-foreground">Excellent</p>
             <div className="flex gap-1">
               {[...Array(5)].map((_, i) => (
                 <svg key={i} className="w-4 h-4 fill-primary" viewBox="0 0 20 20">
@@ -426,11 +401,8 @@ export default function UploadStep() {
                 </svg>
               ))}
             </div>
-            <span className="text-muted-foreground text-sm cursor-default flex items-center gap-2">
-              TrustCaptain
-            </span>
+            <p className="text-sm font-semibold text-foreground">Rated 4.9/5 by 10,000+ happy customers</p>
           </div>
-          <p className="text-sm text-muted-foreground">Over 1 million portraits made</p>
         </motion.div>
       </div>
 
