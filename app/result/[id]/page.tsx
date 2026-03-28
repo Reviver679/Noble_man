@@ -148,8 +148,8 @@ export default function ResultPage() {
                     ) : (
                         <button
                             onClick={() => {
-                                // In a full implementation, this routes to checkout
-                                alert("Redirecting to Shopify checkout...");
+                                localStorage.setItem('noblified_restore_req', requestId);
+                                localStorage.setItem('noblified_auto_checkout', 'digital');
                                 window.location.href = '/';
                             }}
                             className="w-full py-4 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"

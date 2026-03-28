@@ -12,7 +12,7 @@ import SuccessStep from '@/components/steps/SuccessStep';
 import SplashScreen from '@/components/ui/SplashScreen';
 
 function AppContent() {
-  const { step, setStep, setRequestId, setProcessing } = useUploadContext();
+  const { step, setStep, setRequestId, setProcessing, setSelectedProduct } = useUploadContext();
   const router = useRouter();
   const [showSplash, setShowSplash] = useState(true);
 
@@ -20,12 +20,20 @@ function AppContent() {
   useEffect(() => {
     const pendingRequestId = localStorage.getItem('noblified_request_id');
     const restoreRequestId = localStorage.getItem('noblified_restore_req');
+    const autoCheckout = localStorage.getItem('noblified_auto_checkout');
 
     if (restoreRequestId) {
       // Cart restore flow: trigger PreviewStep to poll and download the generation
       localStorage.removeItem('noblified_restore_req');
       setRequestId(restoreRequestId);
-      setStep('generating');
+      
+      if (autoCheckout) {
+        localStorage.removeItem('noblified_auto_checkout');
+        setSelectedProduct(autoCheckout as any);
+        setStep('checkout');
+      } else {
+        setStep('generating');
+      }
     } else if (pendingRequestId) {
       // Existing flow: hard redirect to result page
       router.replace(`/result/${pendingRequestId}`);

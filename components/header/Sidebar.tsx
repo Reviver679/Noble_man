@@ -10,6 +10,8 @@ import {
 import Link from 'next/link';
 import { useUploadContext, StyleType } from '@/lib/uploadContext';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from '../LanguageSwitcher';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -21,6 +23,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const [isCreateOpen, setIsCreateOpen] = useState(true);
   const [isPoliciesOpen, setIsPoliciesOpen] = useState(false);
   const router = useRouter();
+  const { t } = useTranslation();
 
   // Prevent scrolling when sidebar is open
   useEffect(() => {
@@ -64,7 +67,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-border">
               <div className="flex flex-col">
-                <span className="text-sm font-semibold text-muted-foreground">Navigation</span>
+                <span className="text-sm font-semibold text-muted-foreground">{t('nav_navigation')}</span>
               </div>
               <button
                 onClick={onClose}
@@ -85,7 +88,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                   className="flex items-center gap-4 px-4 py-3 text-foreground hover:bg-secondary/50 rounded-xl transition-colors group"
                 >
                   <Home size={20} className="text-muted-foreground group-hover:text-primary transition-colors" />
-                  <span className="font-medium">Home</span>
+                  <span className="font-medium">{t('nav_home')}</span>
                 </Link>
 
                 {/* Create Accordion */}
@@ -96,7 +99,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                   >
                     <div className="flex items-center gap-4">
                       <Palette size={20} className="text-muted-foreground group-hover:text-primary transition-colors" />
-                      <span className="font-medium">Create</span>
+                      <span className="font-medium">{t('nav_create')}</span>
                     </div>
                     {isCreateOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                   </button>
@@ -114,35 +117,35 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                           className={`flex items-center gap-3 px-4 py-2.5 w-full text-left rounded-lg transition-colors ${style === 'Pet Portraits' ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-secondary/30'}`}
                         >
                           <PawPrint size={18} />
-                          <span className="text-sm font-medium">Pet Portraits</span>
+                          <span className="text-sm font-medium">{t('style_pet')}</span>
                         </button>
                         <button
                           onClick={() => handleCreateSelect('Family Portraits')}
                           className={`flex items-center gap-3 px-4 py-2.5 w-full text-left rounded-lg transition-colors ${style === 'Family Portraits' ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-secondary/30'}`}
                         >
                           <Users size={18} />
-                          <span className="text-sm font-medium">Family Portraits</span>
+                          <span className="text-sm font-medium">{t('style_family')}</span>
                         </button>
                         <button
                           onClick={() => handleCreateSelect('Children\'s Portraits')}
                           className={`flex items-center gap-3 px-4 py-2.5 w-full text-left rounded-lg transition-colors ${style === 'Children\'s Portraits' ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-secondary/30'}`}
                         >
                           <Baby size={18} />
-                          <span className="text-sm font-medium">Children's Portraits</span>
+                          <span className="text-sm font-medium">{t('style_children')}</span>
                         </button>
                         <button
                           onClick={() => handleCreateSelect('Couple Portraits')}
                           className={`flex items-center gap-3 px-4 py-2.5 w-full text-left rounded-lg transition-colors ${style === 'Couple Portraits' ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-secondary/30'}`}
                         >
                           <Heart size={18} />
-                          <span className="text-sm font-medium">Couple Portraits</span>
+                          <span className="text-sm font-medium">{t('style_couple')}</span>
                         </button>
                         <button
                           onClick={() => handleCreateSelect('Self-Portraits')}
                           className={`flex items-center gap-3 px-4 py-2.5 w-full text-left rounded-lg transition-colors ${style === 'Self-Portraits' ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-secondary/30'}`}
                         >
                           <User size={18} />
-                          <span className="text-sm font-medium">Self-Portraits</span>
+                          <span className="text-sm font-medium">{t('style_self')}</span>
                         </button>
                       </motion.div>
                     )}
@@ -155,7 +158,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                   className="flex items-center gap-4 px-4 py-3 text-foreground hover:bg-secondary/50 rounded-xl transition-colors group"
                 >
                   <DollarSign size={20} className="text-muted-foreground group-hover:text-primary transition-colors" />
-                  <span className="font-medium">Pricing</span>
+                  <span className="font-medium">{t('nav_pricing')}</span>
                 </Link>
 
                 <Link
@@ -164,14 +167,19 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                   className="flex items-center gap-4 px-4 py-3 text-foreground hover:bg-secondary/50 rounded-xl transition-colors group"
                 >
                   <ShoppingBag size={20} className="text-muted-foreground group-hover:text-primary transition-colors" />
-                  <span className="font-medium">Cart</span>
+                  <span className="font-medium">{t('nav_cart')}</span>
                 </Link>
+              </div>
+
+              {/* Language Switcher Dropdown */}
+              <div className="px-2 py-4 border-b border-border">
+                <LanguageSwitcher />
               </div>
 
               {/* Legal & Support */}
               <div className="px-4 py-6 space-y-1">
                 <span className="px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 block">
-                  Legal & Support
+                  {t('nav_legal_support')}
                 </span>
                 
                 <Link
@@ -180,7 +188,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                   className="flex items-center gap-4 px-4 py-3 text-foreground hover:bg-secondary/50 rounded-xl transition-colors group"
                 >
                   <Info size={20} className="text-muted-foreground group-hover:text-primary transition-colors" />
-                  <span className="font-medium">About Nobilified</span>
+                  <span className="font-medium">{t('nav_about')}</span>
                 </Link>
 
                 <Link
@@ -189,7 +197,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                   className="flex items-center gap-4 px-4 py-3 text-foreground hover:bg-secondary/50 rounded-xl transition-colors group"
                 >
                   <MessageSquare size={20} className="text-muted-foreground group-hover:text-primary transition-colors" />
-                  <span className="font-medium">Get Support</span>
+                  <span className="font-medium">{t('nav_support')}</span>
                 </Link>
               </div>
             </div>

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useUploadContext } from '@/lib/uploadContext';
 import { blobToDataUrl } from '@/lib/watermark';
 import { ChevronLeft, Loader2, Download, Printer, Frame, Check, Sparkles, Paintbrush, Landmark, Crown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const POLL_INTERVAL_MS = 5000;
 // 20 minutes max (240 × 5 s). Only hard-stops on 'Failed' from the API.
@@ -42,6 +43,7 @@ export default function PreviewStep() {
     processing,
     setSelectedProduct,
   } = useUploadContext();
+  const { t } = useTranslation();
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState('Submitting your photo...');
@@ -250,6 +252,21 @@ export default function PreviewStep() {
 
         if (promptTemplate) {
           payload.prompt_template = promptTemplate;
+        } else {
+          try {
+            const tRes = await fetch('/api/face/templates', { cache: 'no-store' });
+            if (tRes.ok) {
+              const tData = await tRes.json();
+              const templates = tData?.message?.templates ?? [];
+              if (templates.length > 0) {
+                const randomTpl = templates[Math.floor(Math.random() * templates.length)].template_name;
+                payload.prompt_template = randomTpl;
+                console.log('[PreviewStep] Selected random template:', randomTpl);
+              }
+            }
+          } catch (e) {
+            console.warn('[PreviewStep] Failed to fetch random template fallback', e);
+          }
         }
 
         const res = await fetch('/api/face/process', {
@@ -321,7 +338,7 @@ export default function PreviewStep() {
             <Loader2 className="w-16 h-16 text-primary" />
           </motion.div>
           <div className="space-y-2 px-4">
-            <h2 className="font-serif text-3xl font-bold text-foreground">Creating Your Masterpiece</h2>
+            <h2 className="font-serif text-3xl font-bold text-foreground">{t('preview_creating_title')}</h2>
             <p className="text-muted-foreground max-w-md mx-auto leading-relaxed">{statusMessage}</p>
           </div>
         </div>
@@ -341,11 +358,11 @@ export default function PreviewStep() {
         <div className="flex items-center justify-between">
           <button onClick={handleBack} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm font-medium">
             <ChevronLeft className="w-4 h-4" />
-            Start Over
+            {t('preview_start_over')}
           </button>
           <div className="flex items-center gap-2 text-primary text-sm font-semibold italic">
             <Sparkles className="w-4 h-4" />
-            AI Masterpiece Generated
+            {t('preview_ai_generated')}
           </div>
         </div>
 
@@ -375,9 +392,9 @@ export default function PreviewStep() {
           <div className="lg:col-span-7 space-y-8">
             <div className="space-y-4">
               <h3 className="font-serif text-4xl font-bold text-foreground leading-tight">
-                Don't Just Save It.<br />Immortalize It.
+                {t('preview_store_title_1')}<br />{t('preview_store_title_2')}
               </h3>
-              <p className="text-xl text-primary font-medium italic">Pixels are temporary. Oil paint lasts centuries.</p>
+              <p className="text-xl text-primary font-medium italic">{t('preview_store_subtitle')}</p>
 
               <div className="bg-card p-6 rounded-xl border border-border shadow-sm space-y-4">
                 <p className="text-muted-foreground leading-relaxed">
@@ -511,7 +528,7 @@ export default function PreviewStep() {
                 onClick={handleBack}
                 className="w-full py-4 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors border border-dashed border-border rounded-xl"
               >
-                Not happy? Try another photo
+                {t('preview_try_another')}
               </button>
             </div>
           </div>

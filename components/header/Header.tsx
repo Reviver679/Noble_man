@@ -4,11 +4,13 @@ import React, { useState, useEffect } from 'react';
 import { useUploadContext, type UploadStep } from '@/lib/uploadContext';
 import { Menu, User, PawPrint, AlertTriangle } from 'lucide-react';
 import Sidebar from './Sidebar';
+import { useTranslation } from 'react-i18next';
 
 export default function Header() {
   const { step, style, setStyle } = useUploadContext();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [rateLimitedMsg, setRateLimitedMsg] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   // Poll rate limit once on mount
   useEffect(() => {
@@ -31,7 +33,7 @@ export default function Header() {
   }, []);
 
   // Breadcrumb labels
-  const stepLabels = ['Upload', 'Preview', 'Download/Order Painting'];
+  const stepLabels = [t('step_upload'), t('step_preview'), t('step_download')];
   const currentStepIndex = step === 'generating' ? 1 : step === 'preview' ? 1 : step === 'checkout' ? 2 : step === 'success' ? 2 : 0;
 
   return (
@@ -82,7 +84,7 @@ export default function Header() {
                   }`}
               >
                 <User size={14} />
-                Humans
+                {t('style_human')}
               </button>
               <button
                 onClick={() => setStyle('Pet Portraits')}
@@ -92,17 +94,19 @@ export default function Header() {
                   }`}
               >
                 <PawPrint size={14} />
-                Pets
+                {t('style_pets')}
               </button>
             </div>
 
-            {/* Hamburger - Right */}
-            <button
-              onClick={() => setIsSidebarOpen(true)}
-              className="p-2 hover:bg-secondary rounded-lg transition-colors"
-            >
-              <Menu size={20} className="text-foreground" />
-            </button>
+            {/* Actions - Right */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsSidebarOpen(true)}
+                className="p-2 hover:bg-secondary rounded-lg transition-colors"
+              >
+                <Menu size={20} className="text-foreground" />
+              </button>
+            </div>
           </div>
 
           {/* Breadcrumb - Centered */}

@@ -6,6 +6,7 @@ import { useUploadContext } from '@/lib/uploadContext';
 import { Upload, AlertCircle, X, ImagePlus, Settings2, Loader2 } from 'lucide-react';
 import CredibilitySection from '@/components/credibility/CredibilitySection';
 import StyleDrawer from './StyleDrawer';
+import { useTranslation } from 'react-i18next';
 
 const MAX_FILES = 5;
 const MAX_FILE_SIZE_MB = 10;
@@ -36,6 +37,7 @@ const GALLERY_CONTENT: Record<string, { step: string; title: string; sub: string
 export default function UploadStep() {
   const { setUploadedImages, setStep, setError, error, style } = useUploadContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { t } = useTranslation();
 
   const [isDragActive, setIsDragActive] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
@@ -50,7 +52,7 @@ export default function UploadStep() {
 
     // Enforce max count
     if (combinedFiles.length > MAX_FILES) {
-      setError(`You can only upload up to ${MAX_FILES} images at once.`);
+      setError(t('upload_max_error', { max: MAX_FILES }) as string);
       combinedFiles.splice(MAX_FILES);
     }
 
@@ -59,11 +61,11 @@ export default function UploadStep() {
     // Validate each file
     for (const file of combinedFiles) {
       if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-        setError('Please upload only JPG, PNG, or WebP images.');
+        setError(t('upload_type_error') as string);
         return;
       }
       if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-        setError(`All images must be smaller than ${MAX_FILE_SIZE_MB}MB.`);
+        setError(t('upload_size_error', { max: MAX_FILE_SIZE_MB }) as string);
         return;
       }
       validFiles.push(file);
@@ -128,7 +130,7 @@ export default function UploadStep() {
 
   const handleSubmit = async () => {
     if (files.length === 0) {
-      setError('Please select at least one image first');
+      setError(t('upload_select_error') as string);
       return;
     }
 
@@ -139,7 +141,7 @@ export default function UploadStep() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to check rate limits');
+        throw new Error(data.error || (t('upload_rate_limit_check_error') as string));
       }
 
       const limitStatus = data.message;
@@ -148,7 +150,7 @@ export default function UploadStep() {
           // Display the first blocking error message
           setError(limitStatus.errors[0].message);
         } else {
-          setError('Rate limit reached. Please try again later.');
+          setError(t('upload_rate_limit_reached') as string);
         }
         return;
       }
@@ -181,9 +183,9 @@ export default function UploadStep() {
             transition={{ delay: 0.1, duration: 0.5 }}
             className="font-serif text-4xl md:text-6xl font-bold text-foreground italic"
           >
-            Claim Your Rightful
+            {t('hero_title_1')}
             <br />
-            Place in History.
+            {t('hero_title_2')}
           </motion.h2>
 
           <motion.p
@@ -192,7 +194,7 @@ export default function UploadStep() {
             transition={{ delay: 0.2, duration: 0.5 }}
             className="text-sm md:text-lg text-muted-foreground"
           >
-            See yourself as a timeless masterpiece. Free preview · No credit card required.
+            {t('hero_subtitle')}
           </motion.p>
         </div>
 
@@ -256,13 +258,13 @@ export default function UploadStep() {
                       className="w-24 h-24 md:w-32 md:h-32 rounded-lg border-2 border-dashed border-border flex flex-col items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors bg-muted/30"
                     >
                       <ImagePlus size={24} className="mb-2" />
-                      <span className="text-xs font-medium">Add Photo</span>
+                      <span className="text-xs font-medium">{t('upload_add_photo')}</span>
                     </motion.button>
                   )}
                 </AnimatePresence>
               </div>
               <p className="text-xs md:text-sm text-muted-foreground">
-                {previews.length} of {MAX_FILES} photos selected
+                {t('upload_selected_text', { current: previews.length, max: MAX_FILES })}
               </p>
             </div>
           ) : (
@@ -277,10 +279,10 @@ export default function UploadStep() {
               </div>
               <div className="space-y-1 md:space-y-2 px-2 md:px-0">
                 <p className="text-sm md:text-base font-semibold text-foreground">
-                  Upload 1 to {MAX_FILES} photos below. (Peasants, nobility, and pets welcome.)
+                  {t('upload_prompt_title', { max: MAX_FILES })}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Ensure faces are clearly visible. We'll pick the best one.
+                  {t('upload_prompt_subtitle')}
                 </p>
               </div>
             </div>
@@ -316,12 +318,12 @@ export default function UploadStep() {
           {isCheckingLimit ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin" />
-              Checking availability...
+              {t('upload_btn_checking')}
             </>
           ) : files.length > 0 ? (
-            `Reveal My Masterpiece (${files.length})`
+            t('upload_btn_reveal_count', { count: files.length }) as string
           ) : (
-            'Reveal My Masterpiece'
+            t('upload_btn_reveal') as string
           )}
         </motion.button>
         {/* <button
@@ -401,7 +403,7 @@ export default function UploadStep() {
                 </svg>
               ))}
             </div>
-            <p className="text-sm font-semibold text-foreground">Rated 4.9/5 by 10,000+ happy customers</p>
+            <p className="text-sm font-semibold text-foreground">{t('trust_rating')}</p>
           </div>
         </motion.div>
       </div>

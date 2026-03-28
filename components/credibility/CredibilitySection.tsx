@@ -3,8 +3,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Paintbrush, Crown, Landmark } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function CredibilitySection() {
+    const { t } = useTranslation();
     return (
         <section className="bg-background py-16 px-4 md:px-8 border-t border-border">
             <div className="max-w-6xl mx-auto space-y-20">
@@ -13,10 +15,10 @@ export default function CredibilitySection() {
                 <div className="text-center space-y-8 max-w-3xl mx-auto">
                     <div className="space-y-4">
                         <h2 className="font-serif text-4xl md:text-5xl font-bold text-foreground">
-                            Hand-Painted Masterpieces Since 2013
+                            {t('cred_title_1')}
                         </h2>
                         <p className="text-lg text-muted-foreground">
-                            For over ten years, we’ve been turning everyday humans and exceptionally good pets into historical royalty.
+                            {t('cred_desc_1')}
                         </p>
                     </div>
 
@@ -30,9 +32,9 @@ export default function CredibilitySection() {
                             <div className="p-4 bg-primary/10 text-primary rounded-full mb-2">
                                 <Paintbrush className="w-8 h-8" />
                             </div>
-                            <h3 className="font-bold text-lg text-foreground">100% Real Oil Paint</h3>
+                            <h3 className="font-bold text-lg text-foreground">{t('cred_title_2')}</h3>
                             <p className="text-sm text-muted-foreground">
-                                No oversized office printers. Just master artists and a blank canvas.
+                                {t('cred_desc_2')}
                             </p>
                         </motion.div>
 
@@ -46,9 +48,9 @@ export default function CredibilitySection() {
                             <div className="p-4 bg-primary/10 text-primary rounded-full mb-2">
                                 <Crown className="w-8 h-8" />
                             </div>
-                            <h3 className="font-bold text-lg text-foreground">Maximum Grandeur</h3>
+                            <h3 className="font-bold text-lg text-foreground">{t('cred_title_3')}</h3>
                             <p className="text-sm text-muted-foreground">
-                                Because a regular selfie simply doesn't command enough respect.
+                                {t('cred_desc_3')}
                             </p>
                         </motion.div>
 
@@ -62,9 +64,9 @@ export default function CredibilitySection() {
                             <div className="p-4 bg-primary/10 text-primary rounded-full mb-2">
                                 <Landmark className="w-8 h-8" />
                             </div>
-                            <h3 className="font-bold text-lg text-foreground">Heirloom Quality</h3>
+                            <h3 className="font-bold text-lg text-foreground">{t('cred_title_4')}</h3>
                             <p className="text-sm text-muted-foreground">
-                                Painted so beautifully, your descendants will literally fight over it.
+                                {t('cred_desc_4')}
                             </p>
                         </motion.div>
                     </div>
