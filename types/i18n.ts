@@ -30,9 +30,10 @@ const localeMap: Record<string, Locale> = {
 export function resolveLocale(lang: string | undefined): Locale {
   if (!lang) return 'en';
   
-  // Exact match
-  if (SUPPORTED_LOCALES.includes(lang as Locale)) {
-    return lang as Locale;
+  // Exact match (case-insensitive)
+  const exactMatch = SUPPORTED_LOCALES.find(l => l.toLowerCase() === lang.toLowerCase());
+  if (exactMatch) {
+    return exactMatch;
   }
   
   // Base language match

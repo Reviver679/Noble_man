@@ -6,9 +6,21 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import resourcesToBackend from 'i18next-resources-to-backend';
 import { SUPPORTED_LOCALES, resolveLocale } from '@/types/i18n';
 
+const languageDetector = new LanguageDetector();
+languageDetector.addDetector({
+  name: 'noblified_navigator',
+  lookup() {
+    if (typeof window !== 'undefined' && window.navigator) {
+      const browserLang = window.navigator.languages ? window.navigator.languages[0] : window.navigator.language;
+      return resolveLocale(browserLang);
+    }
+    return undefined;
+  }
+});
+
 i18next
   .use(initReactI18next)
-  .use(LanguageDetector)
+  .use(languageDetector)
   .use(
     resourcesToBackend(async (language: string, namespace: string) => {
       try {
@@ -30,7 +42,7 @@ i18next
     fallbackNS: 'common',
     ns: ['common'],
     detection: {
-      order: ['localStorage', 'navigator', 'htmlTag'],
+      order: ['localStorage', 'noblified_navigator', 'htmlTag'],
       lookupLocalStorage: 'i18nextLng',
       caches: ['localStorage'],
     },
