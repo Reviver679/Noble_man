@@ -42,6 +42,7 @@ export default function PreviewStep() {
     setProcessing,
     processing,
     setSelectedProduct,
+    customerEmail,
   } = useUploadContext();
   const { t } = useTranslation();
 
@@ -248,6 +249,10 @@ export default function PreviewStep() {
           payload.image = base64Images[0];
         } else {
           payload.images = base64Images;
+        }
+
+        if (customerEmail) {
+          payload.customer_email = customerEmail;
         }
 
         if (promptTemplate) {

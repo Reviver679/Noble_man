@@ -48,5 +48,10 @@
   "cred_title_3": "Maximal Storhet",
   "cred_desc_3": "För en vanlig selfie inbringar helt enkelt inte tillräckligt med respekt.",
   "cred_title_4": "Kvalitet i Generationer",
-  "cred_desc_4": "Så vackert målat att dina ättlingar bokstavligen kommer att slåss om den."
+  "cred_desc_4": "Så vackert målat att dina ättlingar bokstavligen kommer att slåss om den.",
+  "email_prompt_title": "Ett steg före ditt porträtt!",
+  "email_prompt_desc": "Du har skapat några porträtt idag! För att fortsätta generera säkert, vänligen ange din e-postadress.",
+  "email_prompt_placeholder": "royal@example.com",
+  "email_prompt_cancel": "Avbryt",
+  "email_prompt_continue": "Fortsätt"
 }

@@ -48,5 +48,10 @@
   "cred_title_3": "Maximum Grandeur",
   "cred_desc_3": "Because a regular selfie simply doesn't command enough respect.",
   "cred_title_4": "Heirloom Quality",
-  "cred_desc_4": "Painted so beautifully, your descendants will literally fight over it."
+  "cred_desc_4": "Painted so beautifully, your descendants will literally fight over it.",
+  "email_prompt_title": "One step before your portrait!",
+  "email_prompt_desc": "You've created a few portraits today! To continue generating safely, please enter your email address.",
+  "email_prompt_placeholder": "royal@example.com",
+  "email_prompt_cancel": "Cancel",
+  "email_prompt_continue": "Continue"
 }

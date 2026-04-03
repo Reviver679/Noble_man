@@ -33,6 +33,7 @@ export interface UploadContextType {
   promptTemplate: string;
   /** The product the user selected in PreviewStep ('canvas' | 'digital') */
   selectedProduct: SelectedProductType;
+  customerEmail: string;
 
   // Actions
   setStep: (step: UploadStep) => void;
@@ -49,6 +50,7 @@ export interface UploadContextType {
   setPrompt: (prompt: string) => void;
   setPromptTemplate: (template: string) => void;
   setSelectedProduct: (product: SelectedProductType) => void;
+  setCustomerEmail: (email: string) => void;
   reset: () => void;
 }
 
@@ -68,6 +70,7 @@ export function UploadProvider({ children }: { children: ReactNode }) {
   const [prompt, setPrompt] = useState<string>('baroque');
   const [promptTemplate, setPromptTemplate] = useState<string>('');
   const [selectedProduct, setSelectedProduct] = useState<SelectedProductType>('digital');
+  const [customerEmail, setCustomerEmail] = useState<string>('');
 
   /** Set an array of uploaded images; also keeps uploadedImage in sync */
   const setUploadedImages = (files: File[]) => {
@@ -93,6 +96,7 @@ export function UploadProvider({ children }: { children: ReactNode }) {
     setPrompt('baroque');
     setPromptTemplate('');
     setSelectedProduct('digital');
+    setCustomerEmail('');
   };
 
   const value: UploadContextType = {
@@ -110,6 +114,7 @@ export function UploadProvider({ children }: { children: ReactNode }) {
     prompt,
     promptTemplate,
     selectedProduct,
+    customerEmail,
     setStep,
     setUploadedImage,
     setUploadedImages,
@@ -124,6 +129,7 @@ export function UploadProvider({ children }: { children: ReactNode }) {
     setPrompt,
     setPromptTemplate,
     setSelectedProduct,
+    setCustomerEmail,
     reset,
   };
 

@@ -48,5 +48,10 @@
   "cred_title_3": "Maksymalny Majestat",
   "cred_desc_3": "Ponieważ zwykłe selfie nie budzi wystarczającego szacunku.",
   "cred_title_4": "Rodzinna Pamiątka",
-  "cred_desc_4": "Namalowane tak pięknie, że Twoi potomkowie będą o nie walczyć."
+  "cred_desc_4": "Namalowane tak pięknie, że Twoi potomkowie będą o nie walczyć.",
+  "email_prompt_title": "Jeden krok przed Twoim portretem!",
+  "email_prompt_desc": "Stworzyłeś dzisiaj kilka portretów! Aby bezpiecznie kontynuować generowanie, wprowadź swój adres e-mail.",
+  "email_prompt_placeholder": "royal@example.com",
+  "email_prompt_cancel": "Anuluj",
+  "email_prompt_continue": "Kontynuuj"
 }

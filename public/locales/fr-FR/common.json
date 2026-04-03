@@ -48,5 +48,10 @@
   "cred_title_3": "Grandeur Maximale",
   "cred_desc_3": "Parce qu'un selfie normal n'impose tout simplement pas assez de respect.",
   "cred_title_4": "Qualité Héritage",
-  "cred_desc_4": "Peint si magnifiquement que vos descendants se battront littéralement pour l'avoir."
+  "cred_desc_4": "Peint si magnifiquement que vos descendants se battront littéralement pour l'avoir.",
+  "email_prompt_title": "Une étape avant votre portrait !",
+  "email_prompt_desc": "Vous avez créé quelques portraits aujourd'hui ! Pour continuer à générer en toute sécurité, veuillez entrer votre adresse e-mail.",
+  "email_prompt_placeholder": "royal@example.com",
+  "email_prompt_cancel": "Annuler",
+  "email_prompt_continue": "Continuer"
 }

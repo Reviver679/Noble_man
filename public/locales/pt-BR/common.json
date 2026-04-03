@@ -48,5 +48,10 @@
   "cred_title_3": "Maior Grandeza",
   "cred_desc_3": "Porque uma selfie normal simplesmente não impõe respeito suficiente.",
   "cred_title_4": "Qualidade de Herança",
-  "cred_desc_4": "Pintado com tanta beleza que seus descendentes literalmente lutarão por ele."
+  "cred_desc_4": "Pintado com tanta beleza que seus descendentes literalmente lutarão por ele.",
+  "email_prompt_title": "Um passo antes do seu retrato!",
+  "email_prompt_desc": "Você criou alguns retratos hoje! Para continuar gerando com segurança, insira seu endereço de e-mail.",
+  "email_prompt_placeholder": "royal@example.com",
+  "email_prompt_cancel": "Cancelar",
+  "email_prompt_continue": "Continuar"
 }

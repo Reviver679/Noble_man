@@ -48,5 +48,10 @@
   "cred_title_3": "Pinakamatinding Karingalan",
   "cred_desc_3": "Dahil ang karaniwang selfie ay hindi ganoon kagaya sa mata ng iba.",
   "cred_title_4": "Pang-pamana na Kalidad",
-  "cred_desc_4": "Pininturahan nang napakaganda kaya maglalaban-laban ang iyong mga inapo para dito."
+  "cred_desc_4": "Pininturahan nang napakaganda kaya maglalaban-laban ang iyong mga inapo para dito.",
+  "email_prompt_title": "Isang hakbang bago ang iyong larawan!",
+  "email_prompt_desc": "Lumikha ka ng ilang larawan ngayon! Upang patuloy na makabuo nang ligtas, mangyaring ilagay ang iyong email address.",
+  "email_prompt_placeholder": "royal@example.com",
+  "email_prompt_cancel": "Kanselahin",
+  "email_prompt_continue": "Magpatuloy"
 }

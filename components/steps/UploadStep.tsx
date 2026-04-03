@@ -3,7 +3,7 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUploadContext } from '@/lib/uploadContext';
-import { Upload, AlertCircle, X, ImagePlus, Settings2, Loader2 } from 'lucide-react';
+import { Upload, AlertCircle, X, ImagePlus, Settings2, Loader2, Mail } from 'lucide-react';
 import CredibilitySection from '@/components/credibility/CredibilitySection';
 import StyleDrawer from './StyleDrawer';
 import { useTranslation } from 'react-i18next';
@@ -35,7 +35,7 @@ const GALLERY_CONTENT: Record<string, { step: string; title: string; sub: string
 };
 
 export default function UploadStep() {
-  const { setUploadedImages, setStep, setError, error, style } = useUploadContext();
+  const { setUploadedImages, setStep, setError, error, style, customerEmail, setCustomerEmail } = useUploadContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
 
@@ -43,6 +43,8 @@ export default function UploadStep() {
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isEmailPromptOpen, setIsEmailPromptOpen] = useState(false);
+  const [emailInput, setEmailInput] = useState('');
 
   const processFiles = (newFiles: File[]) => {
     setError(null);
@@ -155,6 +157,11 @@ export default function UploadStep() {
         return;
       }
 
+      if (limitStatus && limitStatus.daily_used > 1 && !customerEmail) {
+        setIsEmailPromptOpen(true);
+        return;
+      }
+
       setStep('generating');
     } catch (err) {
       console.error('Rate limit check failed:', err);
@@ -164,6 +171,15 @@ export default function UploadStep() {
     } finally {
       setIsCheckingLimit(false);
     }
+  };
+
+  const handleEmailSubmit = () => {
+    if (!emailInput || !emailInput.includes('@')) {
+      return;
+    }
+    setCustomerEmail(emailInput);
+    setIsEmailPromptOpen(false);
+    setStep('generating');
   };
 
   return (
@@ -302,6 +318,59 @@ export default function UploadStep() {
                 <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0" />
                 <p className="text-sm text-destructive">{error}</p>
               </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Email Prompt Overlay */}
+        <AnimatePresence>
+          {isEmailPromptOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm"
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                className="bg-card w-full max-w-md p-6 rounded-2xl shadow-xl border border-border space-y-4"
+              >
+                <div className="flex items-center justify-center w-12 h-12 mx-auto bg-primary/10 rounded-full">
+                  <Mail className="w-6 h-6 text-primary" />
+                </div>
+                <div className="text-center space-y-2">
+                  <h3 className="text-xl font-bold font-serif text-foreground">{t('email_prompt_title')}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {t('email_prompt_desc')}
+                  </p>
+                </div>
+                <input
+                  type="email"
+                  value={emailInput}
+                  onChange={(e) => setEmailInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleEmailSubmit()}
+                  placeholder={t('email_prompt_placeholder') as string}
+                  className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  autoFocus
+                />
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setIsEmailPromptOpen(false)}
+                    className="flex-1 py-3 px-4 rounded-lg font-medium border border-border text-foreground hover:bg-muted transition-colors"
+                  >
+                    {t('email_prompt_cancel')}
+                  </button>
+                  <button
+                    onClick={handleEmailSubmit}
+                    disabled={!emailInput || !emailInput.includes('@')}
+                    className="flex-1 py-3 px-4 rounded-lg font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
+                  >
+                    {t('email_prompt_continue')}
+                  </button>
+                </div>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>

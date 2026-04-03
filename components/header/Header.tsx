@@ -63,16 +63,10 @@ export default function Header() {
           {/* Top bar with logo centered and buttons */}
           <div className="flex items-center justify-between mb-6">
             {/* Logo - Left */}
-            <div className="flex flex-col">
+            <a href="/" className="flex flex-col hover:opacity-80 transition-opacity">
               {/* Logo image */}
               <img src="/nobilified.png" alt="Nobilified" className="h-8 md:h-10 w-auto object-contain" />
-              {/* <h1 className="font-serif text-xl md:text-2xl font-bold text-foreground leading-none">
-                Nobilified
-              </h1>
-              <p className="font-serif text-[10px] md:text-xs italic text-primary mt-1">
-                Hand-painted Royalty
-              </p> */}
-            </div>
+            </a>
 
             {/* Style Toggle - Center */}
             <div className="flex items-center gap-1 bg-card rounded-full px-1.5 py-1.5 border border-border">

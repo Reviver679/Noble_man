@@ -48,5 +48,10 @@
   "cred_title_3": "Maximale Grandeur",
   "cred_desc_3": "Omdat een gewone selfie simpelweg niet genoeg respect afdwingt.",
   "cred_title_4": "Erfstuk Kwaliteit",
-  "cred_desc_4": "Zo prachtig geschilderd, uw nakomelingen zullen er letterlijk om vechten."
+  "cred_desc_4": "Zo prachtig geschilderd, uw nakomelingen zullen er letterlijk om vechten.",
+  "email_prompt_title": "Nog één stap vóór je portret!",
+  "email_prompt_desc": "Je hebt vandaag een paar portretten gemaakt! Voer je e-mailadres in om veilig door te gaan met genereren.",
+  "email_prompt_placeholder": "royal@example.com",
+  "email_prompt_cancel": "Annuleren",
+  "email_prompt_continue": "Doorgaan"
 }

@@ -48,5 +48,10 @@
   "cred_title_3": "Massima Grandiosità",
   "cred_desc_3": "Perché un normale selfie semplicemente non incute abbastanza rispetto.",
   "cred_title_4": "Qualità da Cimelio",
-  "cred_desc_4": "Dipinto così splendidamente che i tuoi discendenti litigheranno letteralmente per averlo."
+  "cred_desc_4": "Dipinto così splendidamente che i tuoi discendenti litigheranno letteralmente per averlo.",
+  "email_prompt_title": "Un passo prima del tuo ritratto!",
+  "email_prompt_desc": "Hai creato alcuni ritratti oggi! Per continuare a generare in sicurezza, inserisci il tuo indirizzo email.",
+  "email_prompt_placeholder": "royal@example.com",
+  "email_prompt_cancel": "Annulla",
+  "email_prompt_continue": "Continua"
 }

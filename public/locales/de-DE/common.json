@@ -48,5 +48,10 @@
   "cred_title_3": "Maximale Erhabenheit",
   "cred_desc_3": "Weil ein normales Selfie einfach nicht genug Respekt einflößt.",
   "cred_title_4": "Erbstück-Qualität",
-  "cred_desc_4": "So wunderbar gemalt, dass Ihre Nachkommen buchstäblich darum streiten werden."
+  "cred_desc_4": "So wunderbar gemalt, dass Ihre Nachkommen buchstäblich darum streiten werden.",
+  "email_prompt_title": "Ein Schritt vor Ihrem Porträt!",
+  "email_prompt_desc": "Sie haben heute bereits einige Porträts erstellt! Um sicher weiterzugenerieren, geben Sie bitte Ihre E-Mail-Adresse ein.",
+  "email_prompt_placeholder": "royal@example.com",
+  "email_prompt_cancel": "Abbrechen",
+  "email_prompt_continue": "Weiter"
 }
