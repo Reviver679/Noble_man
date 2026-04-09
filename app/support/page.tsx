@@ -38,7 +38,7 @@ export default function SupportPage() {
                 Need immediate assistance? Speak to our support team directly over the phone.
               </p>
               <a href="tel:+18001234567" className="text-primary font-medium hover:underline text-sm">
-                +1 (800) 123-4567
+                +91 (701) 215 4010
               </a>
             </div>
           </div>

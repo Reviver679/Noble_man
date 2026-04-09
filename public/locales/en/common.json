@@ -28,7 +28,7 @@
   "upload_rate_limit_reached": "Rate limit reached. Please try again later.",
   "upload_add_photo": "Add Photo",
   "upload_selected_text": "{{current}} of {{max}} photos selected",
-  "upload_prompt_title": "Upload 1-{{max}} Photos - we'll pick the most regal one. Peasants, nobility, and pets all welcome.",
+  "upload_prompt_title": "Upload 1-{{max}} Photos - Peasants, nobility, and pets all welcome.",
   "upload_prompt_subtitle": "(Clear face required. Sunglasses and hats are frowned upon by the court.)",
   "upload_btn_checking": "Checking availability...",
   "upload_btn_reveal": "→ Paint My Portrait",
