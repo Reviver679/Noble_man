@@ -9,7 +9,8 @@ export const SUPPORTED_LOCALES = [
   'sv-SE',
   'pl-PL',
   'tl-PH',
-  'ar-SA', 'ar-AE', 'ar-EG'
+  'ar-SA', 'ar-AE', 'ar-EG',
+  'ml-IN'
 ] as const;
 
 export type Locale = typeof SUPPORTED_LOCALES[number];
@@ -24,7 +25,8 @@ const localeMap: Record<string, Locale> = {
   sv: 'sv-SE',
   pl: 'pl-PL',
   tl: 'tl-PH',
-  ar: 'ar-SA'
+  ar: 'ar-SA',
+  ml: 'ml-IN'
 };
 
 export function resolveLocale(lang: string | undefined): Locale {

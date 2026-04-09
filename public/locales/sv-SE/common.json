@@ -19,7 +19,7 @@
   "style_pets": "Djur",
   "hero_title_1": "Gör anspråk på din plats",
   "hero_title_2": "i historien.",
-  "hero_subtitle": "Se dig själv som ett mästerverk.",
+  "hero_subtitle": "Ladda upp ett foto. Få ditt kungliga porträtt på några sekunder. Gratis att förhandsgranska - inget kreditkort, inga åtaganden, inga bönder.",
   "upload_max_error": "Max {{max}} bilder.",
   "upload_type_error": "Endast JPG/PNG/WebP.",
   "upload_size_error": "Under {{max}}MB.",
@@ -28,11 +28,11 @@
   "upload_rate_limit_reached": "Begränsning nådd.",
   "upload_add_photo": "Lägg till",
   "upload_selected_text": "{{current}} av {{max}} foton",
-  "upload_prompt_title": "Upp till {{max}} foton.",
-  "upload_prompt_subtitle": "Tydliga ansikten.",
+  "upload_prompt_title": "Ladda upp 1-{{max}} foton - Bönder, adel och husdjur är alla välkomna.",
+  "upload_prompt_subtitle": "(Rent ansikte krävs. Solglasögon och hattar är ogillade av domstolen.)",
   "upload_btn_checking": "Kontrollerar...",
-  "upload_btn_reveal": "Skapa",
-  "upload_btn_reveal_count": "Skapa ({{count}})",
+  "upload_btn_reveal": "→ Måla mitt porträtt",
+  "upload_btn_reveal_count": "→ Måla mitt porträtt ({{count}})",
   "trust_rating": "4.9/5 i betyg",
   "preview_creating_title": "Skapar...",
   "preview_start_over": "Börja om",
@@ -52,6 +52,6 @@
   "email_prompt_title": "Ett steg före ditt porträtt!",
   "email_prompt_desc": "Du har skapat några porträtt idag! För att fortsätta generera säkert, vänligen ange din e-postadress.",
   "email_prompt_placeholder": "royal@example.com",
-  "email_prompt_cancel": "Avbryt",
-  "email_prompt_continue": "Fortsätt"
+  "email_prompt_cancel": "Avboka",
+  "email_prompt_continue": "Fortsätta"
 }

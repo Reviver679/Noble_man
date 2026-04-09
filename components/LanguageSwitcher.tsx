@@ -29,7 +29,8 @@ const LOCALE_NAMES: Record<string, string> = {
   'tl-PH': 'Tagalog',
   'ar-SA': 'العربية (السعودية)',
   'ar-AE': 'العربية (الإمارات)',
-  'ar-EG': 'العربية (مصر)'
+  'ar-EG': 'العربية (مصر)',
+  'ml-IN': 'മലയാളം'
 };
 
 export function LanguageSwitcher() {
