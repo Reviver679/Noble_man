@@ -21,12 +21,26 @@ export default function CheckoutModal() {
     badge?: string;
   }[] = [
       {
-        id: 'canvas',
-        label: 'Hand-Painted Oil Canvas',
-        sublabel: '16x20in / 40x50cm with ornate gold frame',
-        price: 299,
+        id: 'canvas_classic',
+        label: 'Classic Canvas',
+        sublabel: '16x20in - Standard premium size',
+        price: 300,
         icon: Frame,
-        badge: 'PREMIUM',
+      },
+      {
+        id: 'canvas_royal',
+        label: 'Royal Canvas',
+        sublabel: '20x24in - A bold statement piece',
+        price: 370,
+        icon: Frame,
+        badge: 'POPULAR',
+      },
+      {
+        id: 'canvas_grand',
+        label: 'Grand Canvas',
+        sublabel: '30x40in - Large gallery-style centerpiece',
+        price: 590,
+        icon: Frame,
       },
       {
         id: 'digital',
@@ -166,10 +180,10 @@ export default function CheckoutModal() {
           className="text-center space-y-2"
         >
           <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground">
-            Get Your Portrait
+            Your Masterpiece Awaits.
           </h2>
           <p className="text-muted-foreground">
-            Choose your format, then complete your details below
+            Choose your size and format. We'll handle the rest.
           </p>
         </motion.div>
 
@@ -255,9 +269,7 @@ export default function CheckoutModal() {
                 className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
               <p className="text-xs text-muted-foreground">
-                {selectedProduct === 'digital'
-                  ? 'Your download link will be sent here after purchase.'
-                  : 'Your order confirmation and tracking will be sent here.'}
+                Your download link arrives instantly by email. Check your spam folder if you don't see it within a minute.
               </p>
             </div>
           </div>
@@ -288,7 +300,7 @@ export default function CheckoutModal() {
                 Creating Checkout...
               </>
             ) : (
-              `Continue to Payment — $${products.find(p => p.id === selectedProduct)?.price}`
+              `→ Claim My Portrait - $${products.find(p => p.id === selectedProduct)?.price}`
             )}
           </motion.button>
         </motion.form>

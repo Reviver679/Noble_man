@@ -6,6 +6,7 @@ import { useUploadContext } from '@/lib/uploadContext';
 import { blobToDataUrl } from '@/lib/watermark';
 import { ChevronLeft, Loader2, Download, Printer, Frame, Check, Sparkles, Paintbrush, Landmark, Crown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import IllustrationBlock from './IllustrationBlock';
 
 const POLL_INTERVAL_MS = 5000;
 // 20 minutes max (240 × 5 s). Only hard-stops on 'Failed' from the API.
@@ -36,6 +37,8 @@ export default function PreviewStep() {
     setWatermarkedImage,
     setGeneratedImageUrl,
     generatedImageUrl,
+    setGeneratedImagesData,
+    generatedImagesData,
     setRequestId,
     requestId,
     setError,
@@ -164,7 +167,25 @@ export default function PreviewStep() {
       consecutiveErrorsRef.current = 0;
 
       if (status === 'Completed') {
-        const imageDataUrl = data.message.image_data_url;
+        let imageDataUrl = data.message.image_data_url;
+        const images = data.message.images;
+        
+        if (images && images.length > 0) {
+          setGeneratedImagesData(images);
+          
+          // Use the first completed image if available
+          const successfulImage = images.find((img: any) => img.status === 'Completed');
+          if (successfulImage && successfulImage.image_data_url) {
+            imageDataUrl = successfulImage.image_data_url;
+          }
+        }
+        
+        if (!imageDataUrl) {
+           setError('No image was successfully generated. Please try again.');
+           setProcessing(false);
+           return;
+        }
+
         setGeneratedImageUrl(imageDataUrl);
         setStatusMessage('Finishing up...');
         const imgResponse = await fetch(imageDataUrl);
@@ -335,6 +356,16 @@ export default function PreviewStep() {
     setStep('upload');
   };
 
+  const handleSingleDownload = (url: string, index: number = 0) => {
+    if (!url) return;
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `noblified-portrait-preview-${index + 1}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (processing && !previewUrl) {
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen bg-background flex items-center justify-center">
@@ -345,6 +376,17 @@ export default function PreviewStep() {
           <div className="space-y-2 px-4">
             <h2 className="font-serif text-3xl font-bold text-foreground">{t('preview_creating_title')}</h2>
             <p className="text-muted-foreground max-w-md mx-auto leading-relaxed">{statusMessage}</p>
+            
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 3, duration: 1 }}
+              className="mt-8 pt-8 border-t border-border mx-auto max-w-sm text-sm"
+            >
+              <p className="font-serif italic text-primary mb-2">Hand-Painted Masterpieces Since 2013</p>
+              <p className="text-muted-foreground text-xs">For over ten years, we’ve been turning everyday humans and exceptionally good pets into historical royalty.</p>
+            </motion.div>
+            <p className="text-xs text-muted-foreground mt-4 italic">This usually takes 20-40 seconds. Good things take time - especially when you're being immortalized.</p>
           </div>
         </div>
       </motion.div>
@@ -367,7 +409,7 @@ export default function PreviewStep() {
           </button>
           <div className="flex items-center gap-2 text-primary text-sm font-semibold italic">
             <Sparkles className="w-4 h-4" />
-            {t('preview_ai_generated')}
+            ✶ Your Royal Portrait Is Ready
           </div>
         </div>
 
@@ -377,19 +419,64 @@ export default function PreviewStep() {
           {/* Left Side: Preview */}
           <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-8">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 }}
-              className="relative rounded-2xl overflow-hidden bg-card border-4 border-white shadow-2xl"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-center pb-2"
             >
-              {previewUrl && (
-                <img src={previewUrl} alt="Your portrait" className="w-full h-auto" />
-              )}
-              <div className="absolute inset-0 pointer-events-none border border-black/5 rounded-2xl" />
+              <h3 className="font-serif text-2xl font-bold text-foreground">OMG. YOU LOOK INCREDIBLE. 👑</h3>
             </motion.div>
 
+            <div className={`grid gap-4 ${generatedImagesData?.filter(i => i.status === 'Completed').length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+              {generatedImagesData && generatedImagesData.length > 0 ? (
+                generatedImagesData.filter(img => img.status === 'Completed' && img.image_data_url).map((img, idx) => (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.2 + idx * 0.1 }}
+                    className="relative rounded-2xl overflow-hidden bg-card border-4 border-white shadow-xl group"
+                  >
+                    <img src={img.image_data_url} alt={`Portrait option ${idx + 1}`} className="w-full h-auto" />
+                    {img.prompt_template && (
+                      <div className="absolute bottom-2 left-2 bg-background/90 backdrop-blur-sm px-2 py-1 rounded-full text-[10px] font-medium text-foreground border border-border shadow-sm">
+                        {img.prompt_template}
+                      </div>
+                    )}
+                    <button
+                        onClick={() => handleSingleDownload(img.image_data_url || '', idx)}
+                        className="absolute top-2 right-2 bg-background/90 hover:bg-background backdrop-blur-sm p-2 rounded-full cursor-pointer shadow-sm border border-border opacity-0 group-hover:opacity-100 transition-all"
+                        title="Download preview"
+                    >
+                        <Download className="w-3.5 h-3.5 text-foreground hover:text-primary transition-colors" />
+                    </button>
+                    <div className="absolute inset-0 pointer-events-none border border-black/5 rounded-2xl" />
+                  </motion.div>
+                ))
+              ) : (
+                previewUrl && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="relative rounded-2xl overflow-hidden bg-card border-4 border-white shadow-2xl group"
+                  >
+                    <img src={previewUrl} alt="Your portrait" className="w-full h-auto" />
+                    <button
+                        onClick={() => handleSingleDownload(previewUrl || '', 0)}
+                        className="absolute top-3 right-3 bg-background/90 hover:bg-background backdrop-blur-sm p-2 rounded-full cursor-pointer shadow-sm border border-border opacity-0 group-hover:opacity-100 transition-all"
+                        title="Download preview"
+                    >
+                        <Download className="w-4 h-4 text-foreground hover:text-primary transition-colors" />
+                    </button>
+                    <div className="absolute inset-0 pointer-events-none border border-black/5 rounded-2xl" />
+                  </motion.div>
+                )
+              )}
+            </div>
+
             <div className="flex items-center justify-center gap-2 text-xs uppercase tracking-widest text-muted-foreground bg-card rounded-full py-2 border border-border">
-              <span>Preview Mode: <span className="text-foreground font-bold">Unwatermarked</span></span>
+              <span>PREVIEW MODE: <span className="text-foreground font-bold">WATERMARKED</span> (purchase to remove)</span>
             </div>
           </div>
 
@@ -403,7 +490,7 @@ export default function PreviewStep() {
 
               <div className="bg-card p-6 rounded-xl border border-border shadow-sm space-y-4">
                 <p className="text-muted-foreground leading-relaxed">
-                  You’ve seen the preview, now claim the masterpiece. Commission one of our master artists to bring your digital concept to life. <strong className="text-foreground">100% hand-painted using authentic oil paints on premium canvas</strong>—just like the royals did it.
+                  You've seen the portrait. Now make it permanent... Commission one of our master artists to bring your digital concept to life. <strong className="text-foreground">100% hand-painted using authentic oil paints on premium canvas</strong>—just like the royals did it.
                 </p>
 
                 <ul className="space-y-3 pt-2">
@@ -430,6 +517,9 @@ export default function PreviewStep() {
                   </li>
                 </ul>
               </div>
+              
+              {/* Insert the visual comparison illustration block here */}
+              <IllustrationBlock />
             </div>
 
             {/* Options */}
@@ -474,7 +564,7 @@ export default function PreviewStep() {
                       onClick={() => { setSelectedProduct('digital'); setStep('checkout'); }}
                       className="w-full mt-2 py-4 rounded-lg font-bold text-base transition-all bg-primary text-primary-foreground hover:shadow-xl hover:bg-primary/90"
                     >
-                      Get Digital File
+                      Download My Portrait - $20
                     </button>
                   </div>
                 </div>
@@ -500,9 +590,9 @@ export default function PreviewStep() {
                     <div className="flex items-baseline justify-between border-b border-border/50 pb-4">
                       <div>
                         <h4 className="font-serif font-bold text-2xl text-foreground">Hand-Painted Oil Canvas</h4>
-                        <p className="text-sm font-medium text-muted-foreground mt-1">16x20in / 40x50cm</p>
+                        <p className="text-sm font-medium text-muted-foreground mt-1">3 Sizes Available</p>
                       </div>
-                      <span className="text-3xl font-bold text-foreground">$299</span>
+                      <span className="text-3xl font-bold text-foreground">From $199</span>
                     </div>
 
                     <div className="space-y-2 text-sm text-muted-foreground">
@@ -517,7 +607,7 @@ export default function PreviewStep() {
                     </div>
 
                     <button
-                      onClick={() => { setSelectedProduct('canvas'); setStep('checkout'); }}
+                      onClick={() => { setSelectedProduct('canvas_royal'); setStep('checkout'); }}
                       className="w-full mt-2 py-4 rounded-lg font-bold text-base transition-all bg-secondary text-secondary-foreground hover:shadow-md hover:bg-secondary/80"
                     >
                       Commission Canvas
@@ -533,7 +623,7 @@ export default function PreviewStep() {
                 onClick={handleBack}
                 className="w-full py-4 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors border border-dashed border-border rounded-xl"
               >
-                {t('preview_try_another')}
+                Not quite right? → Generate a new portrait
               </button>
             </div>
           </div>

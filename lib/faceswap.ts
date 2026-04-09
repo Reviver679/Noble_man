@@ -37,15 +37,27 @@ export interface FaceSwapSubmitResponse {
   status: 'Queued';
 }
 
+export interface FaceSwapImageResult {
+  prompt_template: string;
+  status: 'Completed' | 'Failed';
+  image_b64?: string;
+  image_data_url?: string;
+  error_message?: string;
+}
+
 export interface FaceSwapStatusResponse {
   request_id: string;
   status: 'Queued' | 'Processing' | 'Completed' | 'Failed';
+  /** Array of all generated images (new format) */
+  images?: FaceSwapImageResult[];
   /** Raw base64 string (no data URL prefix) — present when status = Completed */
   image_b64?: string;
   /** data:image/png;base64,… string ready for <img src> — present when status = Completed */
   image_data_url?: string;
   /** Human-readable error — present when status = Failed */
   error_message?: string;
+
+  payment_status?: 'Paid' | 'Unpaid';
 }
 
 export interface FaceSwapSubmitOptions {
@@ -131,26 +143,26 @@ export async function submitFaceSwap(
   if (!response.ok) {
     let errorMessage = `[faceswap] Process API error (${response.status})`;
     try {
-        const errJson = await response.clone().json();
-        if (errJson._server_messages) {
-            // Parse escaped string array if applicable e.g "[\"Message\"]"
-            try {
-                const parsed = JSON.parse(errJson._server_messages);
-                if (Array.isArray(parsed) && parsed.length > 0) {
-                    errorMessage = parsed[0];
-                } else {
-                    errorMessage = errJson._server_messages;
-                }
-            } catch {
-                errorMessage = errJson._server_messages;
-            }
-        } else if (errJson.error) {
-            errorMessage = errJson.error;
-        } else {
-            errorMessage += `: ${await response.text()}`;
+      const errJson = await response.clone().json();
+      if (errJson._server_messages) {
+        // Parse escaped string array if applicable e.g "[\"Message\"]"
+        try {
+          const parsed = JSON.parse(errJson._server_messages);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            errorMessage = parsed[0];
+          } else {
+            errorMessage = errJson._server_messages;
+          }
+        } catch {
+          errorMessage = errJson._server_messages;
         }
-    } catch {
+      } else if (errJson.error) {
+        errorMessage = errJson.error;
+      } else {
         errorMessage += `: ${await response.text()}`;
+      }
+    } catch {
+      errorMessage += `: ${await response.text()}`;
     }
     throw new Error(errorMessage);
   }
@@ -210,25 +222,25 @@ export async function submitFaceSwapMultipart(
   if (!response.ok) {
     let errorMessage = `[faceswap] Multipart process API error (${response.status})`;
     try {
-        const errJson = await response.clone().json();
-        if (errJson._server_messages) {
-            try {
-                const parsed = JSON.parse(errJson._server_messages);
-                if (Array.isArray(parsed) && parsed.length > 0) {
-                    errorMessage = parsed[0];
-                } else {
-                    errorMessage = errJson._server_messages;
-                }
-            } catch {
-                errorMessage = errJson._server_messages;
-            }
-        } else if (errJson.error) {
-            errorMessage = errJson.error;
-        } else {
-            errorMessage += `: ${await response.text()}`;
+      const errJson = await response.clone().json();
+      if (errJson._server_messages) {
+        try {
+          const parsed = JSON.parse(errJson._server_messages);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            errorMessage = parsed[0];
+          } else {
+            errorMessage = errJson._server_messages;
+          }
+        } catch {
+          errorMessage = errJson._server_messages;
         }
-    } catch {
+      } else if (errJson.error) {
+        errorMessage = errJson.error;
+      } else {
         errorMessage += `: ${await response.text()}`;
+      }
+    } catch {
+      errorMessage += `: ${await response.text()}`;
     }
     throw new Error(errorMessage);
   }

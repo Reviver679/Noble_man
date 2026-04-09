@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { FaceSwapImageResult } from './faceswap';
 
 export type UploadStep = 'upload' | 'generating' | 'preview' | 'checkout' | 'success';
 export type StyleType = 'Pet Portraits' | 'Family Portraits' | 'Children\'s Portraits' | 'Couple Portraits' | 'Self-Portraits';
@@ -12,7 +13,7 @@ export interface PurchaseData {
   orderId: string;
 }
 
-export type SelectedProductType = 'canvas' | 'digital';
+export type SelectedProductType = 'digital' | 'canvas_classic' | 'canvas_royal' | 'canvas_grand';
 
 export interface UploadContextType {
   step: UploadStep;
@@ -23,6 +24,8 @@ export interface UploadContextType {
   generatedImage: Blob | null;
   watermarkedImage: Blob | null;
   generatedImageUrl: string | null;
+  /** Array of all generated images metadata/results */
+  generatedImagesData: FaceSwapImageResult[];
   requestId: string | null;
   style: StyleType;
   processing: boolean;
@@ -31,7 +34,7 @@ export interface UploadContextType {
   prompt: string;
   /** Name of a Prompt Template on the backend (empty string = use backend default) */
   promptTemplate: string;
-  /** The product the user selected in PreviewStep ('canvas' | 'digital') */
+  /** The product the user selected in PreviewStep */
   selectedProduct: SelectedProductType;
   customerEmail: string;
 
@@ -42,6 +45,7 @@ export interface UploadContextType {
   setGeneratedImage: (blob: Blob | null) => void;
   setWatermarkedImage: (blob: Blob | null) => void;
   setGeneratedImageUrl: (url: string | null) => void;
+  setGeneratedImagesData: (images: FaceSwapImageResult[]) => void;
   setRequestId: (id: string | null) => void;
   setStyle: (style: StyleType) => void;
   setProcessing: (processing: boolean) => void;
@@ -62,6 +66,7 @@ export function UploadProvider({ children }: { children: ReactNode }) {
   const [generatedImage, setGeneratedImage] = useState<Blob | null>(null);
   const [watermarkedImage, setWatermarkedImage] = useState<Blob | null>(null);
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
+  const [generatedImagesData, setGeneratedImagesData] = useState<FaceSwapImageResult[]>([]);
   const [requestId, setRequestId] = useState<string | null>(null);
   const [style, setStyle] = useState<StyleType>('Self-Portraits');
   const [processing, setProcessing] = useState(false);
@@ -88,6 +93,7 @@ export function UploadProvider({ children }: { children: ReactNode }) {
     setGeneratedImage(null);
     setWatermarkedImage(null);
     setGeneratedImageUrl(null);
+    setGeneratedImagesData([]);
     setRequestId(null);
     setStyle('Self-Portraits');
     setProcessing(false);
@@ -106,6 +112,7 @@ export function UploadProvider({ children }: { children: ReactNode }) {
     generatedImage,
     watermarkedImage,
     generatedImageUrl,
+    generatedImagesData,
     requestId,
     style,
     processing,
@@ -121,6 +128,7 @@ export function UploadProvider({ children }: { children: ReactNode }) {
     setGeneratedImage,
     setWatermarkedImage,
     setGeneratedImageUrl,
+    setGeneratedImagesData,
     setRequestId,
     setStyle,
     setProcessing,

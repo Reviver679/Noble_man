@@ -8,7 +8,13 @@ import { Check, Download, RotateCcw, Loader2, Lock } from 'lucide-react';
 interface ResultData {
     status: string;
     image_data_url?: string;
-    is_paid?: boolean; // Hydrated from DB in a full implementation
+    payment_status?: 'Paid' | 'Unpaid';
+    images?: Array<{
+        prompt_template?: string;
+        image_data_url?: string;
+        status?: string;
+        error_message?: string;
+    }>;
 }
 
 export default function ResultPage() {
@@ -44,15 +50,36 @@ export default function ResultPage() {
     }, [requestId]);
 
     const handleDownload = () => {
-        if (!result?.image_data_url) return;
+        const imagesToDownload = result?.images?.filter(i => i.status === 'Completed' && i.image_data_url) || [];
+        const urls = imagesToDownload.length > 0
+            ? imagesToDownload.map(i => i.image_data_url)
+            : (result?.image_data_url ? [result.image_data_url] : []);
 
+        if (urls.length === 0) return;
+
+        urls.forEach((url, i) => {
+            if (!url) return;
+            setTimeout(() => {
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `noblified-portrait-${requestId}-${i + 1}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }, i * 200); // 200ms delay to prevent browser blocking multiple downloads
+        });
+    };
+
+    const handleSingleDownload = (url: string, index: number = 0) => {
+        if (!url) return;
         const link = document.createElement('a');
-        link.href = result.image_data_url;
-        link.download = `noblified-portrait-${requestId}.png`;
+        link.href = url;
+        link.download = `noblified-portrait-${requestId}-${index + 1}.png`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     };
+
 
     if (loading) {
         return (
@@ -105,27 +132,82 @@ export default function ResultPage() {
                     </p>
                 </motion.div>
 
-                {/* Portrait */}
-                {result.image_data_url && (
-                    <div className="relative">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: 0.2 }}
-                            className="rounded-lg overflow-hidden border-4 border-white shadow-xl bg-card"
-                        >
-                            <img
-                                src={result.image_data_url}
-                                alt="Your portrait"
-                                className="w-full h-auto"
-                            />
-                        </motion.div>
+                {/* Portraits Grid */}
+                {((result.images?.filter(i => i.status === 'Completed' && i.image_data_url).length ?? 0) > 0 || result.image_data_url) && (
+                    <div className={`grid gap-6 ${result.images && result.images.filter(i => i.status === 'Completed').length > 1 ? 'md:grid-cols-2 lg:grid-cols-2' : 'grid-cols-1 max-w-sm mx-auto'}`}>
+                        {result.images && result.images.length > 0 ? (
+                            result.images
+                                .filter(img => img.status === 'Completed' && img.image_data_url)
+                                .map((img, idx) => (
+                                    <div key={idx} className="relative">
+                                        <motion.div
+                                            initial={{ opacity: 0, scale: 0.95 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            transition={{ delay: 0.2 + idx * 0.1 }}
+                                            className="rounded-lg overflow-hidden border-4 border-white shadow-xl bg-card"
+                                        >
+                                            <img
+                                                src={img.image_data_url}
+                                                alt={`Portrait option ${idx + 1}`}
+                                                className="w-full h-auto"
+                                            />
+                                        </motion.div>
 
-                        {!result.is_paid && (
-                            <div className="absolute top-4 right-4 bg-background/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2 shadow-sm border border-border">
-                                <Lock className="w-4 h-4 text-primary" />
-                                <span className="text-xs font-bold uppercase tracking-wider text-foreground">Watermarked Preview</span>
-                            </div>
+                                        {result.payment_status !== 'Paid' && (
+                                            <div className="absolute top-4 right-4 bg-background/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2 shadow-sm border border-border">
+                                                <Lock className="w-4 h-4 text-primary" />
+                                                <span className="text-xs font-bold uppercase tracking-wider text-foreground">Watermarked Preview</span>
+                                            </div>
+                                        )}
+                                        {result.payment_status === 'Paid' && (
+                                            <button
+                                                onClick={() => handleSingleDownload(img.image_data_url || '', idx)}
+                                                className="absolute top-4 right-4 bg-background/90 hover:bg-background backdrop-blur-sm p-2 rounded-full cursor-pointer shadow-sm border border-border group transition-all"
+                                                title="Download this image"
+                                            >
+                                                <Download className="w-4 h-4 text-foreground group-hover:text-primary transition-colors" />
+                                            </button>
+                                        )}
+                                        {img.prompt_template && (
+                                            <div className="absolute bottom-4 left-4 bg-background/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2 shadow-sm border border-border text-xs font-medium text-foreground">
+                                                {img.prompt_template}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))
+                        ) : (
+                            result.image_data_url && (
+                                <div className="relative">
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.95 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        transition={{ delay: 0.2 }}
+                                        className="rounded-lg overflow-hidden border-4 border-white shadow-xl bg-card"
+                                    >
+                                        <img
+                                            src={result.image_data_url}
+                                            alt="Your portrait"
+                                            className="w-full h-auto"
+                                        />
+                                    </motion.div>
+
+                                    {result.payment_status !== 'Paid' && (
+                                        <div className="absolute top-4 right-4 bg-background/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2 shadow-sm border border-border">
+                                            <Lock className="w-4 h-4 text-primary" />
+                                            <span className="text-xs font-bold uppercase tracking-wider text-foreground">Watermarked Preview</span>
+                                        </div>
+                                    )}
+                                    {result.payment_status === 'Paid' && (
+                                        <button
+                                            onClick={() => handleSingleDownload(result.image_data_url || '', 0)}
+                                            className="absolute top-4 right-4 bg-background/90 hover:bg-background backdrop-blur-sm p-2 rounded-full cursor-pointer shadow-sm border border-border group transition-all"
+                                            title="Download this image"
+                                        >
+                                            <Download className="w-4 h-4 text-foreground group-hover:text-primary transition-colors" />
+                                        </button>
+                                    )}
+                                </div>
+                            )
                         )}
                     </div>
                 )}
@@ -137,13 +219,13 @@ export default function ResultPage() {
                     transition={{ delay: 0.3 }}
                     className="space-y-4"
                 >
-                    {result.is_paid ? (
+                    {result.payment_status === 'Paid' ? (
                         <button
                             onClick={handleDownload}
                             className="w-full py-4 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
                         >
                             <Download className="w-5 h-5" />
-                            Download HD Portrait
+                            Download HD Portrait{(result.images?.filter(i => i.status === 'Completed').length ?? 0) > 1 ? 's' : ''}
                         </button>
                     ) : (
                         <button
@@ -155,7 +237,7 @@ export default function ResultPage() {
                             className="w-full py-4 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
                         >
                             <Lock className="w-5 h-5" />
-                            Unlock HD Version
+                            Unlock HD Version{(result.images?.filter(i => i.status === 'Completed').length ?? 0) > 1 ? 's' : ''}
                         </button>
                     )}
 

@@ -75,7 +75,7 @@ export default function CredibilitySection() {
                 {/* As Seen On Section */}
                 <div className="space-y-8 pt-12 border-t border-border/50">
                     <p className="text-center text-sm font-semibold uppercase tracking-widest text-muted-foreground">
-                        As Seen On
+                        As Seen In
                     </p>
 
                     {/* Scrolling logo banner (using css animation/ticker) or simple flex wrap */}

@@ -8,14 +8,14 @@ export default function SupportPage() {
       <div className="min-h-screen bg-background">
         <Header />
         <main className="max-w-4xl mx-auto px-4 py-16 text-center">
-          <h1 className="font-serif text-4xl md:text-5xl font-bold mb-4">Get Support</h1>
+          <h1 className="font-serif text-4xl md:text-5xl font-bold mb-4">At Your Service, Your Majesty</h1>
           <p className="text-muted-foreground text-lg mb-8">
-            Our royal advisors are here to help you with any inquiries or issues.
+            Our royal advisors await your correspondence.
           </p>
 
-          <div className="grid md:grid-cols-3 gap-6 mt-12 mb-16">
+          <div className="grid md:grid-cols-2 gap-6 mt-12 mb-16 max-w-3xl mx-auto">
             {/* Email Support */}
-            <div className="p-6 rounded-2xl border border-border bg-card flex flex-col items-center">
+            <div className="p-6 rounded-2xl border border-border bg-card flex flex-col items-center text-center">
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                 <Mail className="w-6 h-6 text-primary" />
               </div>
@@ -26,20 +26,6 @@ export default function SupportPage() {
               <a href="mailto:admin@nobilified.com" className="text-primary font-medium hover:underline text-sm">
                 admin@nobilified.com
               </a>
-            </div>
-
-            {/* Live Chat (Placeholder) */}
-            <div className="p-6 rounded-2xl border border-border bg-card flex flex-col items-center">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <MessageSquare className="w-6 h-6 text-primary" />
-              </div>
-              <h3 className="font-serif text-xl font-bold mb-2">Live Chat</h3>
-              <p className="text-muted-foreground text-sm mb-4 flex-grow">
-                Chat with an artisan directly. Available Monday to Friday, 9am - 5pm EST.
-              </p>
-              <button className="text-primary font-medium hover:underline text-sm">
-                Start a Chat
-              </button>
             </div>
 
             {/* Phone Support (Placeholder) */}

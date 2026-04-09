@@ -7,7 +7,9 @@
 const SHOPIFY_STORE_DOMAIN = process.env.NEXT_PUBLIC_SHOP_DOMAIN;
 const SHOPIFY_STOREFRONT_TOKEN = process.env.NEXT_PUBLIC_STOREFRONT_TOKEN;
 const HD_VARIANT_ID = process.env.NEXT_DIGITAL_VARIENT_ID || '';
-const CANVAS_VARIANT_ID = process.env.NEXT_PHYSICAL_PRINT_VARIENT_ID || '';
+const CANVAS_CLASSIC_VARIANT_ID = process.env.NEXT_CANVAS_CLASSIC_VARIANT_ID || '';
+const CANVAS_ROYAL_VARIANT_ID = process.env.NEXT_CANVAS_ROYAL_VARIANT_ID || process.env.NEXT_PHYSICAL_PRINT_VARIENT_ID || '';
+const CANVAS_GRAND_VARIANT_ID = process.env.NEXT_CANVAS_GRAND_VARIANT_ID || '';
 
 /**
  * Shopify GraphQL Query Interface
@@ -173,11 +175,16 @@ export const createShopifyCheckout = async (
  * @returns The Shopify checkout URL, or null on error
  */
 export const createCart = async (
-  productType: 'digital' | 'canvas',
+  productType: 'digital' | 'canvas_classic' | 'canvas_royal' | 'canvas_grand',
   requestId: string
 ): Promise<string | null> => {
-  const variantId =
-    productType === 'digital' ? HD_VARIANT_ID : CANVAS_VARIANT_ID;
+  let variantId = '';
+  switch (productType) {
+    case 'digital': variantId = HD_VARIANT_ID; break;
+    case 'canvas_classic': variantId = CANVAS_CLASSIC_VARIANT_ID; break;
+    case 'canvas_royal': variantId = CANVAS_ROYAL_VARIANT_ID; break;
+    case 'canvas_grand': variantId = CANVAS_GRAND_VARIANT_ID; break;
+  }
 
   if (!variantId) {
     console.error(`No variant ID configured for ${productType}`);

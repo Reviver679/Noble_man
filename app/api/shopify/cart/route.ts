@@ -6,9 +6,9 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
         const { productType, requestId } = body;
 
-        if (!productType || !['digital', 'canvas'].includes(productType)) {
+        if (!productType || !['digital', 'canvas_classic', 'canvas_royal', 'canvas_grand'].includes(productType)) {
             return NextResponse.json(
-                { error: 'Missing or invalid productType. Must be "digital" or "canvas".' },
+                { error: 'Missing or invalid productType.' },
                 { status: 400 }
             );
         }
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        let checkoutUrl = await createCart(productType as 'digital' | 'canvas', requestId);
+        let checkoutUrl = await createCart(productType as 'digital' | 'canvas_classic' | 'canvas_royal' | 'canvas_grand', requestId);
 
         if (!checkoutUrl) {
             return NextResponse.json(
