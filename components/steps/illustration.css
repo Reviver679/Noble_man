@@ -36,7 +36,12 @@
 .dark .nob-block { background: transparent; }
 @media (max-width: 560px) {
   .section-headline { font-size: 22px; }
-  .canvas-wrap { width: 160px; height: 175px; }
-  .nob-panel { max-width: 210px; }
+  .nob-panel { max-width: 42%; }
+  .canvas-wrap { width: 100%; height: auto; aspect-ratio: 21 / 23; }
+  .vs-mid { padding: 0 8px; padding-top: 15vw; }
   .celeb-headline { font-size: 17px; }
+  .panel-title { font-size: 13px; }
+  .panel-sub { font-size: 11px; }
+  .price-pill { padding: 4px 12px; font-size: 12px; }
+  .img-badge { font-size: 8px; padding: 2px 6px; }
 }

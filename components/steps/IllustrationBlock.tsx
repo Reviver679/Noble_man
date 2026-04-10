@@ -45,7 +45,7 @@ export default function IllustrationBlock() {
           <div className="panel-label">
             <div className="panel-title">Master Canvas</div>
             <div className="panel-sub">100% Hand-painted art</div>
-            <span className="price-pill price-right">From $199</span>
+            <span className="price-pill price-right">From $300</span>
           </div>
         </div>
       </div>

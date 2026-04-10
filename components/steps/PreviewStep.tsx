@@ -169,21 +169,21 @@ export default function PreviewStep() {
       if (status === 'Completed') {
         let imageDataUrl = data.message.image_data_url;
         const images = data.message.images;
-        
+
         if (images && images.length > 0) {
           setGeneratedImagesData(images);
-          
+
           // Use the first completed image if available
           const successfulImage = images.find((img: any) => img.status === 'Completed');
           if (successfulImage && successfulImage.image_data_url) {
             imageDataUrl = successfulImage.image_data_url;
           }
         }
-        
+
         if (!imageDataUrl) {
-           setError('No image was successfully generated. Please try again.');
-           setProcessing(false);
-           return;
+          setError('No image was successfully generated. Please try again.');
+          setProcessing(false);
+          return;
         }
 
         setGeneratedImageUrl(imageDataUrl);
@@ -252,6 +252,13 @@ export default function PreviewStep() {
       }
 
       if (!uploadedImages || uploadedImages.length === 0 || isSubmittedRef.current) return;
+
+      // Prevent duplicate processing if we already have generated results for this session (e.g. from checkout)
+      if (requestId && (generatedImageUrl || (generatedImagesData && generatedImagesData.length > 0))) {
+        setProcessing(false);
+        return;
+      }
+
       isSubmittedRef.current = true;
       try {
         setProcessing(true);
@@ -376,8 +383,8 @@ export default function PreviewStep() {
           <div className="space-y-2 px-4">
             <h2 className="font-serif text-3xl font-bold text-foreground">{t('preview_creating_title')}</h2>
             <p className="text-muted-foreground max-w-md mx-auto leading-relaxed">{statusMessage}</p>
-            
-            <motion.div 
+
+            <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 3, duration: 1 }}
@@ -427,7 +434,7 @@ export default function PreviewStep() {
               <h3 className="font-serif text-2xl font-bold text-foreground">OMG. YOU LOOK INCREDIBLE. 👑</h3>
             </motion.div>
 
-            <div className={`grid gap-4 ${generatedImagesData?.filter(i => i.status === 'Completed').length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+            <div className={`grid gap-4 ${generatedImagesData?.filter(i => i.status === 'Completed').length > 1 ? 'grid-cols-2' : 'grid-cols-1'} overflow-y-auto max-h-[60vh] lg:max-h-[calc(100vh-16rem)] pr-2`}>
               {generatedImagesData && generatedImagesData.length > 0 ? (
                 generatedImagesData.filter(img => img.status === 'Completed' && img.image_data_url).map((img, idx) => (
                   <motion.div
@@ -444,11 +451,11 @@ export default function PreviewStep() {
                       </div>
                     )}
                     <button
-                        onClick={() => handleSingleDownload(img.image_data_url || '', idx)}
-                        className="absolute top-2 right-2 bg-background/90 hover:bg-background backdrop-blur-sm p-2 rounded-full cursor-pointer shadow-sm border border-border opacity-0 group-hover:opacity-100 transition-all"
-                        title="Download preview"
+                      onClick={() => handleSingleDownload(img.image_data_url || '', idx)}
+                      className="absolute top-2 right-2 bg-background/90 hover:bg-background backdrop-blur-sm p-2 rounded-full cursor-pointer shadow-sm border border-border opacity-0 group-hover:opacity-100 transition-all"
+                      title="Download preview"
                     >
-                        <Download className="w-3.5 h-3.5 text-foreground hover:text-primary transition-colors" />
+                      <Download className="w-3.5 h-3.5 text-foreground hover:text-primary transition-colors" />
                     </button>
                     <div className="absolute inset-0 pointer-events-none border border-black/5 rounded-2xl" />
                   </motion.div>
@@ -463,11 +470,11 @@ export default function PreviewStep() {
                   >
                     <img src={previewUrl} alt="Your portrait" className="w-full h-auto" />
                     <button
-                        onClick={() => handleSingleDownload(previewUrl || '', 0)}
-                        className="absolute top-3 right-3 bg-background/90 hover:bg-background backdrop-blur-sm p-2 rounded-full cursor-pointer shadow-sm border border-border opacity-0 group-hover:opacity-100 transition-all"
-                        title="Download preview"
+                      onClick={() => handleSingleDownload(previewUrl || '', 0)}
+                      className="absolute top-3 right-3 bg-background/90 hover:bg-background backdrop-blur-sm p-2 rounded-full cursor-pointer shadow-sm border border-border opacity-0 group-hover:opacity-100 transition-all"
+                      title="Download preview"
                     >
-                        <Download className="w-4 h-4 text-foreground hover:text-primary transition-colors" />
+                      <Download className="w-4 h-4 text-foreground hover:text-primary transition-colors" />
                     </button>
                     <div className="absolute inset-0 pointer-events-none border border-black/5 rounded-2xl" />
                   </motion.div>
@@ -517,7 +524,7 @@ export default function PreviewStep() {
                   </li>
                 </ul>
               </div>
-              
+
               {/* Insert the visual comparison illustration block here */}
               <IllustrationBlock />
             </div>
@@ -592,7 +599,7 @@ export default function PreviewStep() {
                         <h4 className="font-serif font-bold text-2xl text-foreground">Hand-Painted Oil Canvas</h4>
                         <p className="text-sm font-medium text-muted-foreground mt-1">3 Sizes Available</p>
                       </div>
-                      <span className="text-3xl font-bold text-foreground">From $199</span>
+                      <span className="text-3xl font-bold text-foreground">From $300</span>
                     </div>
 
                     <div className="space-y-2 text-sm text-muted-foreground">
