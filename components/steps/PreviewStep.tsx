@@ -482,8 +482,9 @@ export default function PreviewStep() {
               )}
             </div>
 
-            <div className="flex items-center justify-center gap-2 text-xs uppercase tracking-widest text-muted-foreground bg-card rounded-full py-2 border border-border">
-              <span>PREVIEW MODE: <span className="text-foreground font-bold">WATERMARKED</span> (purchase to remove)</span>
+            <div className="w-full flex flex-col items-center justify-center gap-1 text-xs uppercase tracking-widest text-muted-foreground bg-secondary/30 rounded-2xl py-3 border border-border mt-4 text-center">
+              <span>PREVIEW MODE: <span className="text-foreground font-bold">WATERMARKED</span></span>
+              <span className="text-[10px]">(PURCHASE TO REMOVE)</span>
             </div>
           </div>
 
@@ -508,12 +509,12 @@ export default function PreviewStep() {
                   </div>
 
                   <div className="flex-1 space-y-4">
-                    <div className="flex items-baseline justify-between border-b border-border/50 pb-4">
+                    <div className="flex flex-col sm:flex-row sm:items-baseline justify-between border-b border-border/50 pb-4 gap-2 sm:gap-0">
                       <div>
-                        <h4 className="font-serif font-bold text-2xl text-foreground">High-Res Digital Masterpiece</h4>
+                        <h4 className="font-serif font-bold text-xl sm:text-2xl text-foreground">High-Res Digital Masterpiece</h4>
                         <p className="text-sm font-medium text-muted-foreground mt-1">Ready to download instantly</p>
                       </div>
-                      <span className="text-3xl font-bold text-foreground">$20</span>
+                      <span className="text-2xl sm:text-3xl font-bold text-foreground">$20</span>
                     </div>
 
                     <div className="space-y-2 text-sm text-muted-foreground">
@@ -531,7 +532,11 @@ export default function PreviewStep() {
                       onClick={() => { setSelectedProduct('digital'); setStep('checkout'); }}
                       className="w-full mt-2 py-4 rounded-lg font-bold text-base transition-all bg-primary text-primary-foreground hover:shadow-xl hover:bg-primary/90"
                     >
-                      Download My Portrait - $20
+                      <span className="flex flex-col sm:flex-row items-center justify-center sm:gap-1">
+                        <span>Download My Portrait Bundle</span>
+                        <span className="hidden sm:inline">-</span>
+                        <span>$20</span>
+                      </span>
                     </button>
                   </div>
                 </div>
@@ -554,12 +559,12 @@ export default function PreviewStep() {
                   </div>
 
                   <div className="flex-1 space-y-4">
-                    <div className="flex items-baseline justify-between border-b border-border/50 pb-4">
+                    <div className="flex flex-col sm:flex-row sm:items-baseline justify-between border-b border-border/50 pb-4 gap-2 sm:gap-0">
                       <div>
-                        <h4 className="font-serif font-bold text-2xl text-foreground">Hand-Painted Oil Canvas</h4>
+                        <h4 className="font-serif font-bold text-xl sm:text-2xl text-foreground">Hand-Painted Oil Canvas</h4>
                         <p className="text-sm font-medium text-muted-foreground mt-1">3 Sizes Available</p>
                       </div>
-                      <span className="text-3xl font-bold text-foreground">From $300</span>
+                      <span className="text-2xl sm:text-3xl font-bold text-foreground whitespace-nowrap">From $299</span>
                     </div>
 
                     <div className="space-y-2 text-sm text-muted-foreground">
@@ -568,8 +573,8 @@ export default function PreviewStep() {
                         <span>Stretched on an <strong className="text-foreground">ornate gold frame</strong>.</span>
                       </p>
                       <p className="flex items-start gap-2 bg-secondary/30 p-3 rounded-lg mt-2">
-                        <span className="text-xl">⌛</span>
-                        <span><strong className="text-foreground">Please note:</strong> It takes approximately <strong className="text-foreground">1 month</strong> to meticulously paint, dry, frame, and ship your masterpiece.</span>
+                        <span className="text-xl">🎨</span>
+                        <span><strong className="text-foreground">Please note:</strong> It takes approximately <strong className="text-foreground">4 weeks</strong> to meticulously paint, dry, frame, and ship your masterpiece.</span>
                       </p>
                     </div>
 
@@ -622,7 +627,10 @@ export default function PreviewStep() {
               </div>
 
               {/* Insert the visual comparison illustration block here */}
-              <IllustrationBlock />
+              <IllustrationBlock
+                onBuyDigital={() => { setSelectedProduct('digital'); setStep('checkout'); }}
+                onBuyCanvas={() => { setSelectedProduct('canvas_royal'); setStep('checkout'); }}
+              />
             </div>
 
             {/* Generate Another (De-emphasized) */}
