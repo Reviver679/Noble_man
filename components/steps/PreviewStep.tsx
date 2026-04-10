@@ -489,49 +489,9 @@ export default function PreviewStep() {
 
           {/* Right Side: Storefront */}
           <div className="lg:col-span-7 space-y-8">
-            <div className="space-y-4">
-              <h3 className="font-serif text-4xl font-bold text-foreground leading-tight">
-                {t('preview_store_title_1')}<br />{t('preview_store_title_2')}
-              </h3>
-              <p className="text-xl text-primary font-medium italic">{t('preview_store_subtitle')}</p>
-
-              <div className="bg-card p-6 rounded-xl border border-border shadow-sm space-y-4">
-                <p className="text-muted-foreground leading-relaxed">
-                  You've seen the portrait. Now make it permanent... Commission one of our master artists to bring your digital concept to life. <strong className="text-foreground">100% hand-painted using authentic oil paints on premium canvas</strong>—just like the royals did it.
-                </p>
-
-                <ul className="space-y-3 pt-2">
-                  <li className="flex items-start gap-3 text-sm">
-                    <Paintbrush className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                    <div>
-                      <strong className="text-foreground block">Real Art, Real Artists</strong>
-                      <span className="text-muted-foreground">No digital printing. Every brushstroke is painted by hand.</span>
-                    </div>
-                  </li>
-                  <li className="flex items-start gap-3 text-sm">
-                    <Landmark className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                    <div>
-                      <strong className="text-foreground block">Museum Quality</strong>
-                      <span className="text-muted-foreground">Rich, textured oil paints that look incredible on any wall.</span>
-                    </div>
-                  </li>
-                  <li className="flex items-start gap-3 text-sm">
-                    <Crown className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                    <div>
-                      <strong className="text-foreground block">The Ultimate Heirloom</strong>
-                      <span className="text-muted-foreground">A timeless conversation piece guaranteed to outlast your hard drive.</span>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Insert the visual comparison illustration block here */}
-              <IllustrationBlock />
-            </div>
-
-            {/* Options */}
-            <div className="space-y-6 pt-4">
-              {/* Digital File Option (First Position) */}
+            {/* Buy Options — at the top */}
+            <div className="space-y-6">
+              {/* Digital File Option */}
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -624,6 +584,47 @@ export default function PreviewStep() {
               </motion.div>
             </div>
 
+            {/* Descriptive content below buy cards */}
+            <div className="space-y-4">
+              <h3 className="font-serif text-4xl font-bold text-foreground leading-tight">
+                {t('preview_store_title_1')}<br />{t('preview_store_title_2')}
+              </h3>
+              <p className="text-xl text-primary font-medium italic">{t('preview_store_subtitle')}</p>
+
+              <div className="bg-card p-6 rounded-xl border border-border shadow-sm space-y-4">
+                <p className="text-muted-foreground leading-relaxed">
+                  You've seen the portrait. Now make it permanent... Commission one of our master artists to bring your digital concept to life. <strong className="text-foreground">100% hand-painted using authentic oil paints on premium canvas</strong>—just like the royals did it.
+                </p>
+
+                <ul className="space-y-3 pt-2">
+                  <li className="flex items-start gap-3 text-sm">
+                    <Paintbrush className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-foreground block">Real Art, Real Artists</strong>
+                      <span className="text-muted-foreground">No digital printing. Every brushstroke is painted by hand.</span>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-3 text-sm">
+                    <Landmark className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-foreground block">Museum Quality</strong>
+                      <span className="text-muted-foreground">Rich, textured oil paints that look incredible on any wall.</span>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-3 text-sm">
+                    <Crown className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-foreground block">The Ultimate Heirloom</strong>
+                      <span className="text-muted-foreground">A timeless conversation piece guaranteed to outlast your hard drive.</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Insert the visual comparison illustration block here */}
+              <IllustrationBlock />
+            </div>
+
             {/* Generate Another (De-emphasized) */}
             <div className="pt-4 border-t border-border">
               <button
@@ -639,7 +640,7 @@ export default function PreviewStep() {
         {/* Social Proof */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-12 border-t border-border">
           {[
-            { label: 'Created', val: '1M+' },
+            { label: 'Happy Customers', val: '10,000+' },
             { label: 'Rating', val: '4.8★' },
             { label: 'Secure', val: 'SSL' },
             { label: 'Privacy', val: '100%' },
