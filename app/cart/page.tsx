@@ -5,7 +5,7 @@ import Header from '@/components/header/Header';
 import { motion } from 'framer-motion';
 import { UploadProvider } from '@/lib/uploadContext';
 import { useRouter } from 'next/navigation';
-import { ImagePlus, ShoppingBag, ArrowRight } from 'lucide-react';
+import { ImagePlus, ShoppingBag, ArrowRight, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function CartPage() {
@@ -23,9 +23,38 @@ export default function CartPage() {
     }
   }, []);
 
-  const handleRestore = (item: any) => {
+  const [restoringId, setRestoringId] = useState<string | null>(null);
+
+  const handleRestore = async (item: any) => {
+    setRestoringId(item.id);
+
+    let imageUrl = item.imageUrl;
+
+    // If no cached image URL, try to fetch it from the backend first
+    if (!imageUrl) {
+      try {
+        const res = await fetch('/api/face/status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ request_id: item.id }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const msg = data.message;
+          if (msg?.status === 'Completed') {
+            const img = msg.images?.find((i: any) => i.status === 'Completed');
+            imageUrl = img?.image_data_url || msg.image_data_url || '';
+          }
+        }
+      } catch {
+        // Fall through — restore flow will poll
+      }
+    }
+
     localStorage.setItem('noblified_restore_req', item.id);
-    localStorage.setItem('noblified_restore_url', item.imageUrl);
+    if (imageUrl) {
+      localStorage.setItem('noblified_restore_url', imageUrl);
+    }
     router.push('/');
   };
 
@@ -95,10 +124,14 @@ export default function CartPage() {
                     </div>
                     <button
                       onClick={() => handleRestore(item)}
-                      className="mt-auto w-full flex items-center justify-center gap-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 py-3 rounded-lg font-bold transition-colors"
+                      disabled={restoringId === item.id}
+                      className="mt-auto w-full flex items-center justify-center gap-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 py-3 rounded-lg font-bold transition-colors disabled:opacity-50"
                     >
-                      View & Buy
-                      <ArrowRight className="w-4 h-4" />
+                      {restoringId === item.id ? (
+                        <><Loader2 className="w-4 h-4 animate-spin" /> Loading...</>
+                      ) : (
+                        <><span>View & Buy</span><ArrowRight className="w-4 h-4" /></>
+                      )}
                     </button>
                   </div>
                 </div>

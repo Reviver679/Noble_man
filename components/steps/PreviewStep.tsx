@@ -238,22 +238,40 @@ export default function PreviewStep() {
         }
         setPreviewUrl(imageDataUrl);
 
-        // Save to cart local storage gracefully (prevent QUOTA_EXCEEDED errors from base64 strings)
+        // Save to cart — compress to a tiny thumbnail to avoid blowing up localStorage
         try {
-          const newGen = { id: reqId, imageUrl: imageDataUrl, date: new Date().toISOString() };
+          let thumbUrl = imageDataUrl;
+          // If it's a large data URL, create a small JPEG thumbnail
+          if (imageDataUrl?.startsWith('data:')) {
+            try {
+              thumbUrl = await new Promise<string>((resolve) => {
+                const thumbImg = new Image();
+                thumbImg.onload = () => {
+                  const c = document.createElement('canvas');
+                  const MAX = 150;
+                  let w = thumbImg.width, h = thumbImg.height;
+                  if (w > h) { h = Math.round(h * (MAX / w)); w = MAX; }
+                  else { w = Math.round(w * (MAX / h)); h = MAX; }
+                  c.width = w; c.height = h;
+                  c.getContext('2d')?.drawImage(thumbImg, 0, 0, w, h);
+                  resolve(c.toDataURL('image/jpeg', 0.5));
+                };
+                thumbImg.onerror = () => resolve('');
+                thumbImg.src = imageDataUrl;
+              });
+            } catch { thumbUrl = ''; }
+          }
+          const newGen = { id: reqId, imageUrl: thumbUrl || '', date: new Date().toISOString() };
           let history = JSON.parse(localStorage.getItem('nobilified_cart') || '[]');
 
           if (!history.some((h: any) => h.id === reqId)) {
-            // Keep history small to begin with
             history = [newGen, ...history].slice(0, 5);
             try {
               localStorage.setItem('nobilified_cart', JSON.stringify(history));
-            } catch (e: any) {
-              // If it's a DOMException QuotaExceededError, try discarding the image strings and just save the reqIds
-              if (e.name === 'QuotaExceededError') {
-                const lightweightHistory = history.map((item: any) => ({ ...item, imageUrl: item.imageUrl?.startsWith('data:') ? '' : item.imageUrl }));
-                localStorage.setItem('nobilified_cart', JSON.stringify(lightweightHistory));
-              }
+            } catch {
+              // Quota exceeded — strip thumbnails and save just the IDs
+              const lightweight = history.map((item: any) => ({ ...item, imageUrl: '' }));
+              localStorage.setItem('nobilified_cart', JSON.stringify(lightweight));
             }
           }
         } catch (e) {
@@ -301,9 +319,33 @@ export default function PreviewStep() {
         const cachedUrl = localStorage.getItem('noblified_restore_url_tmp');
         if (cachedUrl) {
           localStorage.removeItem('noblified_restore_url_tmp');
+        }
+
+        // Show cached preview immediately if available, then try to fetch all images in background
+        if (cachedUrl) {
           setPreviewUrl(cachedUrl);
           setProcessing(false);
           setStep('preview');
+
+          // Background fetch to populate all images
+          fetch('/api/face/status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ request_id: requestId }),
+          })
+            .then(res => res.ok ? res.json() : null)
+            .then(data => {
+              const images = data?.message?.images;
+              if (images && images.length > 0) {
+                setGeneratedImagesData(images);
+                const firstCompleted = images.find((img: any) => img.status === 'Completed');
+                if (firstCompleted?.image_data_url) {
+                  setGeneratedImageUrl(firstCompleted.image_data_url);
+                  setPreviewUrl(firstCompleted.image_data_url);
+                }
+              }
+            })
+            .catch(() => { /* keep showing the single cached image */ });
           return;
         }
 
