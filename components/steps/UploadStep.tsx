@@ -130,6 +130,16 @@ export default function UploadStep() {
 
   const [isCheckingLimit, setIsCheckingLimit] = useState(false);
 
+  // Clone File objects into memory-backed copies so they survive DOM input element GC
+  const cloneFilesIntoMemory = async (filesToClone: File[]): Promise<File[]> => {
+    return Promise.all(
+      filesToClone.map(async (f) => {
+        const buffer = await f.arrayBuffer();
+        return new File([buffer], f.name, { type: f.type, lastModified: f.lastModified });
+      })
+    );
+  };
+
   const handleSubmit = async () => {
     if (files.length === 0) {
       setError(t('upload_select_error') as string);
@@ -162,23 +172,38 @@ export default function UploadStep() {
         return;
       }
 
+      // Read file data into JS heap so File objects survive the UploadStep unmount
+      const durableFiles = await cloneFilesIntoMemory(files);
+      setUploadedImages(durableFiles);
+
       setStep('generating');
     } catch (err) {
       console.error('Rate limit check failed:', err);
-      // Fallback: continue to generating if rate limit check itself fails, 
+      // Fallback: continue to generating if rate limit check itself fails,
       // the backend process route will also enforce it.
+      try {
+        const durableFiles = await cloneFilesIntoMemory(files);
+        setUploadedImages(durableFiles);
+      } catch { /* files already in context from processFiles */ }
       setStep('generating');
     } finally {
       setIsCheckingLimit(false);
     }
   };
 
-  const handleEmailSubmit = () => {
+  const handleEmailSubmit = async () => {
     if (!emailInput || !emailInput.includes('@')) {
       return;
     }
     setCustomerEmail(emailInput);
     setIsEmailPromptOpen(false);
+
+    // Read file data into JS heap before transitioning
+    try {
+      const durableFiles = await cloneFilesIntoMemory(files);
+      setUploadedImages(durableFiles);
+    } catch { /* files already in context from processFiles */ }
+
     setStep('generating');
   };
 

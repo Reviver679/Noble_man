@@ -23,8 +23,9 @@ export default function CartPage() {
     }
   }, []);
 
-  const handleRestore = (id: string) => {
-    localStorage.setItem('noblified_restore_req', id);
+  const handleRestore = (item: any) => {
+    localStorage.setItem('noblified_restore_req', item.id);
+    localStorage.setItem('noblified_restore_url', item.imageUrl);
     router.push('/');
   };
 
@@ -65,13 +66,20 @@ export default function CartPage() {
               {cartItems.map((item) => (
                 <div key={item.id} className="bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
                   <div className="aspect-[4/5] bg-muted relative">
-                    <img 
-                      src={item.imageUrl} 
-                      alt="Portrait generation"
-                      className="w-full h-full object-cover"
-                    />
+                    {item.imageUrl ? (
+                      <img
+                        src={item.imageUrl}
+                        alt="Portrait generation"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-secondary/30 text-muted-foreground text-center space-y-2">
+                        <ImagePlus className="w-8 h-8 opacity-50" />
+                        <span className="text-xs font-medium uppercase tracking-wider">Preview Unavailable Offline</span>
+                      </div>
+                    )}
                     <div className="absolute inset-0 bg-background/20 backdrop-blur-[2px] opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
-                       <span className="bg-background/90 text-foreground px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest shadow-sm">Preview</span>
+                      <span className="bg-background/90 text-foreground px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest shadow-sm">Preview</span>
                     </div>
                   </div>
                   <div className="p-4 flex flex-col gap-4 flex-1">
@@ -86,7 +94,7 @@ export default function CartPage() {
                       </p>
                     </div>
                     <button
-                      onClick={() => handleRestore(item.id)}
+                      onClick={() => handleRestore(item)}
                       className="mt-auto w-full flex items-center justify-center gap-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 py-3 rounded-lg font-bold transition-colors"
                     >
                       View & Buy

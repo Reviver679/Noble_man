@@ -20,13 +20,22 @@ function AppContent() {
   useEffect(() => {
     const pendingRequestId = localStorage.getItem('noblified_request_id');
     const restoreRequestId = localStorage.getItem('noblified_restore_req');
+    const restoreUrl = localStorage.getItem('noblified_restore_url');
     const autoCheckout = localStorage.getItem('noblified_auto_checkout');
 
     if (restoreRequestId) {
       // Cart restore flow: trigger PreviewStep to poll and download the generation
       localStorage.removeItem('noblified_restore_req');
+      localStorage.removeItem('noblified_restore_url');
       setRequestId(restoreRequestId);
-      
+
+      if (restoreUrl) {
+        // Pass via localStorage or assume PreviewStep can pick it up?
+        // Actually, let's let PreviewStep pick it up! We don't have setPreviewUrl here.
+        // Let's store it back temporarily so PreviewStep can grab it
+        localStorage.setItem('noblified_restore_url_tmp', restoreUrl);
+      }
+
       if (autoCheckout) {
         localStorage.removeItem('noblified_auto_checkout');
         setSelectedProduct(autoCheckout as any);
