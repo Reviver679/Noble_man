@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUploadContext } from '@/lib/uploadContext';
 import { blobToDataUrl } from '@/lib/watermark';
-import { ChevronLeft, Loader2, Download, Printer, Frame, Check, Sparkles, Paintbrush, Landmark, Crown } from 'lucide-react';
+import { ChevronLeft, Loader2, Download, Printer, Frame, Check, Sparkles, Paintbrush, Landmark, Crown, Lock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import IllustrationBlock from './IllustrationBlock';
 
@@ -667,9 +667,32 @@ export default function PreviewStep() {
               )}
             </div>
 
-            <div className="w-full flex flex-col items-center justify-center gap-1 text-xs uppercase tracking-widest text-muted-foreground bg-secondary/30 rounded-2xl py-3 border border-border mt-4 text-center">
+            {/* Mobile: watermark notice */}
+            <div className="lg:hidden w-full flex flex-col items-center justify-center gap-1 text-xs uppercase tracking-widest text-muted-foreground bg-secondary/30 rounded-2xl py-3 border border-border mt-4 text-center">
               <span>PREVIEW MODE: <span className="text-foreground font-bold">WATERMARKED</span></span>
               <span className="text-[10px]">(PURCHASE TO REMOVE)</span>
+            </div>
+
+            {/* Desktop: sticky buy buttons */}
+            <div className="hidden lg:flex flex-col gap-2 mt-4">
+              <button
+                onClick={() => { setSelectedProduct('canvas_royal'); setStep('checkout'); }}
+                className="w-full py-3.5 rounded-xl font-bold text-base bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-xl flex flex-col items-center justify-center gap-1 shadow-lg transition-all hover:-translate-y-0.5"
+              >
+                <span className="flex items-center gap-2">
+                  <Crown size={20} className="text-yellow-400 shrink-0" />
+                  Paint My Masterpiece
+                </span>
+                <span className="flex items-center gap-2 text-[10px] font-normal text-primary-foreground/70">
+                  <Lock size={9} /> Secure · ★ 4.8 · 10,000+ sold
+                </span>
+              </button>
+              <button
+                onClick={() => { setSelectedProduct('digital'); setStep('checkout'); }}
+                className="w-full py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Or get digital copy — $20
+              </button>
             </div>
           </div>
 
@@ -861,10 +884,15 @@ export default function PreviewStep() {
         <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-background/95 backdrop-blur-sm border-t border-border p-3 space-y-1.5">
           <button
             onClick={() => { setSelectedProduct('canvas_royal'); setStep('checkout'); }}
-            className="w-full py-3.5 rounded-xl font-bold text-base bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-2 shadow-lg"
+            className="w-full py-3.5 rounded-xl font-bold text-base bg-primary text-primary-foreground hover:bg-primary/90 flex flex-col items-center justify-center gap-1 shadow-lg"
           >
-            <Crown size={20} className="text-yellow-400 shrink-0" />
-            Paint My Masterpiece
+            <span className="flex items-center gap-2">
+              <Crown size={20} className="text-yellow-400 shrink-0" />
+              Paint My Masterpiece
+            </span>
+            <span className="flex items-center gap-2 text-[10px] font-normal text-primary-foreground/70">
+              <Lock size={9} /> Secure · ★ 4.8 · 10,000+ sold
+            </span>
           </button>
           <button
             onClick={() => { setSelectedProduct('digital'); setStep('checkout'); }}

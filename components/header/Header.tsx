@@ -37,7 +37,7 @@ export default function Header() {
   const currentStepIndex = step === 'generating' ? 1 : step === 'preview' ? 1 : step === 'checkout' ? 2 : step === 'success' ? 2 : 0;
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white">
+    <header className={`z-50 w-full bg-white ${step === 'preview' || step === 'checkout' ? 'relative' : 'sticky top-0'}`}>
 
       {/* Rate-limit marquee banner */}
       {/* Rate-limit marquee banner */}
