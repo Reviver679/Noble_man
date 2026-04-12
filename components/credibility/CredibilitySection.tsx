@@ -14,6 +14,15 @@ const TESTIMONIALS = [
     { nameKey: 'testimonial_6_name', quoteKey: 'testimonial_6_quote', photo: '/testimonials/review-6.jpg' },
 ] as const;
 
+const PRESS_NAMES = [
+    'COSMOPOLITAN',
+    'USA TODAY',
+    'Esquire',
+    'VOGUE',
+    'METRO',
+    'NEW YORK POST',
+] as const;
+
 function TestimonialQuote({ text, expanded, onToggle }: { text: string; expanded: boolean; onToggle: () => void }) {
     return (
         <div>
@@ -78,24 +87,39 @@ export default function CredibilitySection() {
                 </div>
 
                 {/* As Seen On Section */}
-                <div className="space-y-8 pt-12 border-t border-border/50">
-                    <p className="text-center text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+                <div className="space-y-5 pt-10 border-t border-border/50">
+                    <p className="text-center text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                         As Seen In
                     </p>
 
-                    {/* Scrolling logo banner (using css animation/ticker) or simple flex wrap */}
-                    <div className="flex flex-wrap items-center justify-center auto-cols-max gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-                        {/* Note: Placeholder texts for Logos. Replace with actual SVGs or images when available. */}
-                        <div className="text-xl font-bold font-serif whitespace-nowrap">COSMOPOLITAN</div>
-                        <div className="text-xl font-bold font-sans tracking-tighter whitespace-nowrap">USA TODAY</div>
-                        <div className="text-xl font-bold font-serif italic whitespace-nowrap">INDEPENDENT</div>
-                        <div className="text-xl font-bold font-serif whitespace-nowrap">Esquire</div>
-                        <div className="text-xl font-bold font-sans uppercase whitespace-nowrap">NEW YORK POST</div>
-                        <div className="text-xl font-bold font-sans whitespace-nowrap">METRO</div>
-                        <div className="text-xl font-bold tracking-widest whitespace-nowrap">E! Entertainment Television</div>
-                        <div className="text-xl font-bold font-sans tracking-tight whitespace-nowrap">Sports Illustrated</div>
-                        <div className="text-xl font-bold font-serif whitespace-nowrap">VOGUE</div>
-                        <div className="text-xl font-bold font-sans whitespace-nowrap">Philadelphia Eagles</div>
+                    <div className="-mx-4 overflow-hidden px-4 md:hidden">
+                        <div
+                            className="animate-marquee flex w-max items-center gap-8 pr-8"
+                            style={{ animationDuration: '28s' }}
+                        >
+                            {[...PRESS_NAMES, ...PRESS_NAMES].map((name, index) => (
+                                <span
+                                    key={`${name}-${index}`}
+                                    aria-hidden={index >= PRESS_NAMES.length}
+                                    className="whitespace-nowrap text-base font-semibold text-muted-foreground/70"
+                                >
+                                    {name}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="hidden md:block">
+                        <div className="flex w-full items-center justify-center gap-12">
+                            {PRESS_NAMES.map((name) => (
+                                <span
+                                    key={name}
+                                    className="whitespace-nowrap text-lg font-semibold text-muted-foreground/70"
+                                >
+                                    {name}
+                                </span>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
