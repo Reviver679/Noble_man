@@ -489,9 +489,6 @@ export default function UploadStep() {
               <h2 className="font-serif text-3xl md:text-4xl font-bold leading-tight text-foreground">
                 {t('cred_title_1')}
               </h2>
-              <p className="text-base md:text-lg leading-relaxed text-muted-foreground">
-                {t('cred_desc_1')}
-              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 px-1 sm:px-2 md:px-0">

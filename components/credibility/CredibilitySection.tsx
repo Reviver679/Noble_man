@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Paintbrush, Crown, Landmark, CheckCircle, Star } from 'lucide-react';
+import { CheckCircle, ChevronRight, Star } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const TESTIMONIALS = [
@@ -42,13 +42,25 @@ function TestimonialQuote({ text, expanded, onToggle }: { text: string; expanded
 export default function CredibilitySection() {
     const { t } = useTranslation();
     const [allExpanded, setAllExpanded] = useState(false);
+    const testimonialsRef = useRef<HTMLDivElement>(null);
+
+    const scrollTestimonialsRight = () => {
+        testimonialsRef.current?.scrollBy({
+            left: 210,
+            behavior: 'smooth',
+        });
+    };
+
     return (
         <section className="bg-background pt-6 pb-16 px-4 md:px-8 border-t border-border">
             <div className="max-w-6xl mx-auto space-y-20">
 
                 {/* Testimonials Section */}
-                <div>
-                    <div className="flex gap-3 overflow-x-auto overflow-y-hidden snap-x snap-proximity md:snap-mandatory overscroll-x-contain pb-4 pl-[1px] scrollbar-hide">
+                <div className="relative">
+                    <div
+                        ref={testimonialsRef}
+                        className="flex gap-3 overflow-x-auto overflow-y-hidden snap-x snap-proximity md:snap-mandatory overscroll-x-contain pb-4 px-2 md:px-4 scroll-px-2 md:scroll-px-4 scrollbar-hide"
+                    >
                         {TESTIMONIALS.map((item, i) => (
                             <motion.div
                                 key={item.nameKey}
@@ -83,6 +95,16 @@ export default function CredibilitySection() {
                                 </div>
                             </motion.div>
                         ))}
+                    </div>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center bg-gradient-to-l from-background/70 via-background/20 to-transparent pl-4 pr-2 md:from-background md:via-background/90 md:pl-8 md:pr-1">
+                        <button
+                            type="button"
+                            aria-label="Scroll testimonials"
+                            onClick={scrollTestimonialsRight}
+                            className="pointer-events-auto rounded-full border border-border bg-background/95 p-1 shadow-sm transition-colors hover:bg-muted"
+                        >
+                            <ChevronRight className="w-4 h-4 text-primary" />
+                        </button>
                     </div>
                 </div>
 
