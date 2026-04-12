@@ -13,8 +13,8 @@ const MAX_FILE_SIZE_MB = 10;
 
 const GALLERY_CONTENT: Record<string, { step: string; title: string; sub: string; img: string }[]> = {
   'Pet Portraits': [
-    { step: "I", title: "The Selection", sub: "Upload Photo", img: "/pet_cat.jpeg" },
-    { step: "II", title: "The Creation", sub: "Hand Painted", img: "/pet_dog.jpeg" }
+    { step: "I", title: "The Selection", sub: "Upload Photo", img: "/pet_dog.jpeg" },
+    { step: "II", title: "The Creation", sub: "Hand Painted", img: "/pet_cat.jpeg" }
   ],
   'Family Portraits': [
     { step: "I", title: "The Selection", sub: "Upload Photo", img: "/family1.jpeg" },
