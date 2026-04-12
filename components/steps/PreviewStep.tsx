@@ -592,7 +592,7 @@ export default function PreviewStep() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen bg-background py-12 px-4 md:px-8"
+      className="min-h-screen bg-background py-12 px-4 md:px-8 pb-28 lg:pb-12"
     >
       <div className="max-w-5xl mx-auto space-y-12">
         {/* Header Area */}
@@ -855,6 +855,25 @@ export default function PreviewStep() {
           ))}
         </div>
       </div>
+
+      {/* Sticky bottom bar — mobile/tablet only */}
+      {previewUrl && (
+        <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-background/95 backdrop-blur-sm border-t border-border p-3 space-y-1.5">
+          <button
+            onClick={() => { setSelectedProduct('canvas_royal'); setStep('checkout'); }}
+            className="w-full py-3.5 rounded-xl font-bold text-base bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-2 shadow-lg"
+          >
+            <Crown size={20} className="text-yellow-400 shrink-0" />
+            Paint My Masterpiece
+          </button>
+          <button
+            onClick={() => { setSelectedProduct('digital'); setStep('checkout'); }}
+            className="w-full py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Or get digital copy — $20
+          </button>
+        </div>
+      )}
     </motion.div>
   );
 }
