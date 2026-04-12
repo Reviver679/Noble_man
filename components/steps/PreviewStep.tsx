@@ -677,68 +677,25 @@ export default function PreviewStep() {
           <div className="lg:col-span-7 space-y-8">
             {/* Buy Options — at the top */}
             <div className="space-y-6">
-              {/* Digital File Option */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 }}
-                className="group relative border-2 border-border bg-card rounded-xl p-6 transition-all hover:border-primary/50"
-              >
-
-                <div className="flex gap-5">
-                  <div className="p-4 rounded-xl bg-secondary text-secondary-foreground h-fit">
-                    <Download size={32} />
-                  </div>
-
-                  <div className="flex-1 space-y-4">
-                    <div className="flex flex-col xl:flex-row xl:items-baseline justify-between border-b border-border/50 pb-4 gap-2 xl:gap-4 w-full overflow-hidden">
-                      <div className="min-w-0 flex-1">
-                        <h4 className="font-serif font-bold text-xl sm:text-2xl text-foreground break-words whitespace-normal">High-Res Digital Masterpiece</h4>
-                        <p className="text-sm font-medium text-muted-foreground mt-1">Ready to download instantly</p>
-                      </div>
-                      <span className="text-2xl sm:text-3xl font-bold text-foreground whitespace-nowrap">$20</span>
-                    </div>
-
-                    <div className="space-y-2 text-sm text-muted-foreground">
-                      <p className="flex items-start gap-2">
-                        <Check size={16} className="text-primary mt-0.5 shrink-0" />
-                        <span>High-resolution, completely <strong className="text-foreground">watermark-free</strong>.</span>
-                      </p>
-                      <p className="flex items-start gap-2">
-                        <Check size={16} className="text-primary mt-0.5 shrink-0" />
-                        <span>Perfect for <strong className="text-foreground">social media</strong> or your own printing.</span>
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={() => { setSelectedProduct('digital'); setStep('checkout'); }}
-                      className="w-full mt-4 py-3 sm:py-4 px-2 rounded-lg font-bold text-[14px] sm:text-base transition-all bg-secondary text-secondary-foreground hover:shadow-md hover:bg-secondary/80 border border-transparent shadow-sm flex items-center justify-center gap-2"
-                    >
-                      <Download size={18} className="shrink-0" />
-                      <span className="leading-tight">Download Digital Masterpiece</span>
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-
               {/* Commission Canvas Option */}
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.4 }}
-                className="group relative border-2 border-primary bg-primary/5 ring-4 ring-primary/10 rounded-xl p-6 transition-all"
+                transition={{ delay: 0.3 }}
+                className="group relative border-2 border-primary bg-primary/5 ring-4 ring-primary/10 rounded-xl p-4 sm:p-6 transition-all"
               >
-                <div className="absolute -top-3 right-6 bg-primary text-primary-foreground text-xs font-bold px-4 py-1 rounded-full uppercase tracking-widest shadow-md flex items-center gap-1">
+                <div className="absolute -top-3 right-4 sm:right-6 bg-primary text-primary-foreground text-[10px] sm:text-xs font-bold px-3 sm:px-4 py-1 rounded-full uppercase tracking-widest shadow-md flex items-center gap-1">
                   <Crown size={12} />
                   Most Popular
                 </div>
 
-                <div className="flex gap-5">
-                  <div className="p-4 rounded-xl bg-primary text-primary-foreground h-fit shadow-inner">
-                    <Frame size={32} />
+                <div className="flex flex-col sm:flex-row gap-4 sm:gap-5">
+                  <div className="p-3 sm:p-4 rounded-xl bg-primary text-primary-foreground h-fit w-fit shadow-inner">
+                    <Frame size={24} className="sm:hidden" />
+                    <Frame size={32} className="hidden sm:block" />
                   </div>
 
-                  <div className="flex-1 space-y-4">
+                  <div className="flex-1 min-w-0 space-y-4">
                     <div className="flex flex-col xl:flex-row xl:items-baseline justify-between border-b border-border/50 pb-4 gap-2 xl:gap-4 w-full overflow-hidden">
                       <div className="min-w-0 flex-1">
                         <h4 className="font-serif font-bold text-xl sm:text-2xl text-foreground break-words whitespace-normal">Hand-Painted Oil Canvas</h4>
@@ -772,10 +729,55 @@ export default function PreviewStep() {
 
                     <button
                       onClick={() => { setSelectedProduct('canvas_royal'); setStep('checkout'); }}
-                      className="w-full mt-6 py-4 sm:py-5 px-2 rounded-xl font-bold text-base sm:text-lg transition-all bg-primary text-primary-foreground hover:shadow-xl hover:bg-primary/90 flex flex-row items-center justify-center gap-2 transform hover:-translate-y-0.5"
+                      className="w-full mt-6 py-4 sm:py-5 px-2 rounded-xl font-bold text-base sm:text-lg transition-all bg-primary text-primary-foreground hover:shadow-xl hover:bg-primary/90 flex flex-row items-center justify-center gap-2 transform hover:-translate-y-0.5 mx-auto sm:w-full max-w-sm sm:max-w-none"
                     >
                       <Crown size={22} className="text-yellow-400 shrink-0" />
                       <span className="leading-tight">Paint My Masterpiece</span>
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Digital File Option */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4 }}
+                className="group relative border-2 border-border bg-card rounded-xl p-4 sm:p-6 transition-all hover:border-primary/50"
+              >
+
+                <div className="flex flex-col sm:flex-row gap-4 sm:gap-5">
+                  <div className="p-3 sm:p-4 rounded-xl bg-secondary text-secondary-foreground h-fit w-fit">
+                    <Download size={24} className="sm:hidden" />
+                    <Download size={32} className="hidden sm:block" />
+                  </div>
+
+                  <div className="flex-1 min-w-0 space-y-4">
+                    <div className="flex flex-col xl:flex-row xl:items-baseline justify-between border-b border-border/50 pb-4 gap-2 xl:gap-4 w-full overflow-hidden">
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-serif font-bold text-xl sm:text-2xl text-foreground break-words whitespace-normal">High-Res Digital Masterpiece</h4>
+                        <p className="text-sm font-medium text-muted-foreground mt-1">Ready to download instantly</p>
+                      </div>
+                      <span className="text-2xl sm:text-3xl font-bold text-foreground whitespace-nowrap">$20</span>
+                    </div>
+
+                    <div className="space-y-2 text-sm text-muted-foreground">
+                      <p className="flex items-start gap-2">
+                        <Check size={16} className="text-primary mt-0.5 shrink-0" />
+                        <span>High-resolution, completely <strong className="text-foreground">watermark-free</strong>.</span>
+                      </p>
+                      <p className="flex items-start gap-2">
+                        <Check size={16} className="text-primary mt-0.5 shrink-0" />
+                        <span>Perfect for <strong className="text-foreground">social media</strong> or your own printing.</span>
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => { setSelectedProduct('digital'); setStep('checkout'); }}
+                      className="w-full mt-4 py-3 sm:py-4 px-2 rounded-lg font-bold text-[14px] sm:text-base transition-all bg-secondary text-secondary-foreground hover:shadow-md hover:bg-secondary/80 border border-transparent shadow-sm flex items-center justify-center gap-2 mx-auto sm:w-full max-w-sm sm:max-w-none"
+                    >
+                      <Download size={18} className="shrink-0" />
+                      <span className="leading-tight">Download Digital Masterpiece</span>
                     </button>
                   </div>
                 </div>

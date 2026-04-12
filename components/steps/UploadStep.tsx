@@ -3,7 +3,7 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUploadContext } from '@/lib/uploadContext';
-import { Upload, AlertCircle, X, ImagePlus, Settings2, Loader2, Mail } from 'lucide-react';
+import { Upload, AlertCircle, X, ImagePlus, Settings2, Loader2, Mail, Paintbrush, Crown, Landmark } from 'lucide-react';
 import CredibilitySection from '@/components/credibility/CredibilitySection';
 import StyleDrawer from './StyleDrawer';
 import { useTranslation } from 'react-i18next';
@@ -481,6 +481,61 @@ export default function UploadStep() {
           </AnimatePresence>
         </motion.div>
 
+
+        {/* Who We Are Section */}
+        <div className="text-center space-y-8 max-w-3xl mx-auto pt-8 border-t border-border">
+          <div className="space-y-4">
+            <h2 className="font-serif text-4xl md:text-5xl font-bold text-foreground">
+              {t('cred_title_1')}
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              {t('cred_desc_1')}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="space-y-3 flex flex-col items-center text-center"
+            >
+              <div className="p-4 bg-primary/10 text-primary rounded-full mb-2">
+                <Paintbrush className="w-8 h-8" />
+              </div>
+              <h3 className="font-bold text-lg text-foreground">{t('cred_title_2')}</h3>
+              <p className="text-sm text-muted-foreground">{t('cred_desc_2')}</p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="space-y-3 flex flex-col items-center text-center"
+            >
+              <div className="p-4 bg-primary/10 text-primary rounded-full mb-2">
+                <Crown className="w-8 h-8" />
+              </div>
+              <h3 className="font-bold text-lg text-foreground">{t('cred_title_3')}</h3>
+              <p className="text-sm text-muted-foreground">{t('cred_desc_3')}</p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="space-y-3 flex flex-col items-center text-center"
+            >
+              <div className="p-4 bg-primary/10 text-primary rounded-full mb-2">
+                <Landmark className="w-8 h-8" />
+              </div>
+              <h3 className="font-bold text-lg text-foreground">{t('cred_title_4')}</h3>
+              <p className="text-sm text-muted-foreground">{t('cred_desc_4')}</p>
+            </motion.div>
+          </div>
+        </div>
 
         {/* Trust Section */}
         <motion.div

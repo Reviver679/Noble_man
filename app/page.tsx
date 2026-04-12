@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { UploadProvider, useUploadContext } from '@/lib/uploadContext';
@@ -14,7 +14,12 @@ import SplashScreen from '@/components/ui/SplashScreen';
 function AppContent() {
   const { step, setStep, setRequestId, setProcessing, setSelectedProduct } = useUploadContext();
   const router = useRouter();
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // On landing, check if there's a pending requestId from a previous checkout
   useEffect(() => {
@@ -48,6 +53,10 @@ function AppContent() {
       router.replace(`/result/${pendingRequestId}`);
     }
   }, [router, setRequestId, setStep]);
+
+  if (!mounted) {
+    return <div className="min-h-screen bg-background" />;
+  }
 
   return (
     <AnimatePresence mode="wait">
