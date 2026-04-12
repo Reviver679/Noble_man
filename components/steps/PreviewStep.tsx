@@ -526,8 +526,8 @@ export default function PreviewStep() {
           <div className="text-center space-y-4">
             <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground">{t('preview_creating_title')}</h2>
 
-            <div className="h-48 sm:h-64 w-full relative flex items-center justify-center overflow-hidden bg-transparent my-2">
-              <AnimatePresence mode="popLayout">
+            <div className="h-56 sm:h-72 w-full relative flex items-center justify-center bg-transparent my-4">
+              <AnimatePresence mode="wait">
                 <motion.img
                   key={messageIndex % LOADING_IMAGES.length}
                   src={LOADING_IMAGES[messageIndex % LOADING_IMAGES.length]}
@@ -536,14 +536,14 @@ export default function PreviewStep() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 1.05 }}
                   transition={{ duration: 1 }}
-                  className="absolute inset-0 w-full h-full object-contain"
+                  className="absolute inset-0 m-auto max-h-full max-w-full object-contain border-4 sm:border-[6px] border-border shadow-2xl rounded-md bg-muted"
                 />
               </AnimatePresence>
             </div>
 
             <div className="space-y-3 px-8 w-full mt-4">
               <div className="flex justify-between text-sm font-medium text-foreground">
-                <span>Crafting your masterpiece...</span>
+                <span>{t('preview_loading_progress')}</span>
                 <span>{Math.floor(progress)}%</span>
               </div>
               <div className="h-3 w-full bg-secondary/50 rounded-full overflow-hidden shadow-inner">
@@ -579,8 +579,8 @@ export default function PreviewStep() {
             transition={{ delay: 3, duration: 1 }}
             className="mt-12 pt-8 border-t border-border mx-auto max-w-sm text-center text-sm"
           >
-            <p className="font-serif italic text-primary mb-2">Hand-Painted Masterpieces Since 2013</p>
-            <p className="text-muted-foreground text-xs">For over ten years, we’ve been turning everyday humans and exceptionally good pets into historical royalty.</p>
+            <p className="font-serif italic text-primary mb-2">{t('preview_loading_tagline')}</p>
+            <p className="text-muted-foreground text-xs">{t('preview_loading_tagline_desc')}</p>
           </motion.div>
         </div>
       </motion.div>
@@ -603,7 +603,7 @@ export default function PreviewStep() {
           </button>
           <div className="flex items-center gap-2 text-primary text-sm font-semibold italic">
             <Sparkles className="w-4 h-4" />
-            ✶ Your Royal Portrait Is Ready
+            {t('preview_portrait_ready')}
           </div>
         </div>
 
@@ -618,7 +618,7 @@ export default function PreviewStep() {
               transition={{ delay: 0.1 }}
               className="text-center pb-2"
             >
-              <h3 className="font-serif text-2xl font-bold text-foreground">OMG. YOU LOOK INCREDIBLE. 👑</h3>
+              <h3 className="font-serif text-2xl font-bold text-foreground">{t('preview_you_look_incredible')}</h3>
             </motion.div>
 
             <div className={`grid gap-4 ${generatedImagesData?.filter(i => i.status === 'Completed').length > 1 ? 'grid-cols-2' : 'grid-cols-1'} overflow-y-auto max-h-[60vh] lg:max-h-[calc(100vh-16rem)] pr-2`}>
@@ -669,8 +669,8 @@ export default function PreviewStep() {
 
             {/* Mobile: watermark notice */}
             <div className="lg:hidden w-full flex flex-col items-center justify-center gap-1 text-xs uppercase tracking-widest text-muted-foreground bg-secondary/30 rounded-2xl py-3 border border-border mt-4 text-center">
-              <span>PREVIEW MODE: <span className="text-foreground font-bold">WATERMARKED</span></span>
-              <span className="text-[10px]">(PURCHASE TO REMOVE)</span>
+              <span>{t('preview_watermark_label')} <span className="text-foreground font-bold">{t('preview_watermark_value')}</span></span>
+              <span className="text-[10px]">{t('preview_watermark_hint')}</span>
             </div>
 
             {/* Desktop: sticky buy buttons */}
@@ -681,17 +681,17 @@ export default function PreviewStep() {
               >
                 <span className="flex items-center gap-2">
                   <Crown size={20} className="text-yellow-400 shrink-0" />
-                  Paint My Masterpiece
+                  {t('preview_paint_my_masterpiece')}
                 </span>
                 <span className="flex items-center gap-2 text-[10px] font-normal text-primary-foreground/70">
-                  <Lock size={9} /> Secure · ★ 4.8 · 10,000+ sold
+                  <Lock size={9} /> {t('preview_trust_badge')}
                 </span>
               </button>
               <button
                 onClick={() => { setSelectedProduct('digital'); setStep('checkout'); }}
                 className="w-full py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
-                Or get digital copy — $20
+                {t('preview_or_digital')}
               </button>
             </div>
           </div>
@@ -709,7 +709,7 @@ export default function PreviewStep() {
               >
                 <div className="absolute -top-3 right-4 sm:right-6 bg-primary text-primary-foreground text-[10px] sm:text-xs font-bold px-3 sm:px-4 py-1 rounded-full uppercase tracking-widest shadow-md flex items-center gap-1">
                   <Crown size={12} />
-                  Most Popular
+                  {t('preview_most_popular')}
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-4 sm:gap-5">
@@ -721,31 +721,31 @@ export default function PreviewStep() {
                   <div className="flex-1 min-w-0 space-y-4">
                     <div className="flex flex-col xl:flex-row xl:items-baseline justify-between border-b border-border/50 pb-4 gap-2 xl:gap-4 w-full overflow-hidden">
                       <div className="min-w-0 flex-1">
-                        <h4 className="font-serif font-bold text-xl sm:text-2xl text-foreground break-words whitespace-normal">Hand-Painted Oil Canvas</h4>
-                        <p className="text-sm font-medium text-muted-foreground mt-1">3 Sizes Available</p>
+                        <h4 className="font-serif font-bold text-xl sm:text-2xl text-foreground break-words whitespace-normal">{t('preview_canvas_title')}</h4>
+                        <p className="text-sm font-medium text-muted-foreground mt-1">{t('preview_canvas_sizes')}</p>
                       </div>
-                      <span className="text-2xl sm:text-3xl font-bold text-primary whitespace-nowrap">From $299</span>
+                      <span className="text-2xl sm:text-3xl font-bold text-primary whitespace-nowrap">{t('preview_canvas_price')}</span>
                     </div>
 
                     <div className="space-y-3 text-sm text-muted-foreground pt-2">
                       <p className="flex items-start gap-3">
                         <Check size={18} className="text-primary mt-0.5 shrink-0" />
-                        <span><strong className="text-foreground">100% Pure Hand-Painted Oil</strong> by master artists.</span>
+                        <span><strong className="text-foreground">{t('preview_canvas_benefit_1_bold')}</strong> {t('preview_canvas_benefit_1')}</span>
                       </p>
                       <p className="flex items-start gap-3">
                         <Check size={18} className="text-primary mt-0.5 shrink-0" />
-                        <span><strong className="text-foreground">Museum-Grade Quality</strong> designed to last centuries.</span>
+                        <span><strong className="text-foreground">{t('preview_canvas_benefit_2_bold')}</strong> {t('preview_canvas_benefit_2')}</span>
                       </p>
                       <p className="flex items-start gap-3">
                         <Check size={18} className="text-primary mt-0.5 shrink-0" />
-                        <span><strong className="text-foreground">The Ultimate Royalty Experience</strong> wrapped on an ornate gold frame.</span>
+                        <span><strong className="text-foreground">{t('preview_canvas_benefit_3_bold')}</strong> {t('preview_canvas_benefit_3')}</span>
                       </p>
 
                       <div className="flex items-start gap-3 bg-card border border-primary/20 p-4 rounded-xl mt-4 shadow-sm">
                         <span className="text-2xl shrink-0 mt-1 drop-shadow-sm">🎨</span>
                         <div className="space-y-1">
-                          <strong className="text-foreground block font-bold text-[15px]">Authentic Process</strong>
-                          <span className="text-muted-foreground inline-block leading-relaxed">Allow roughly <strong className="text-foreground">4 weeks</strong> for our artists to meticulously hand-paint, dry, frame, and safely ship your bespoke masterpiece.</span>
+                          <strong className="text-foreground block font-bold text-[15px]">{t('preview_canvas_process_title')}</strong>
+                          <span className="text-muted-foreground inline-block leading-relaxed" dangerouslySetInnerHTML={{ __html: t('preview_canvas_process_desc') }} />
                         </div>
                       </div>
                     </div>
@@ -755,7 +755,7 @@ export default function PreviewStep() {
                       className="w-full mt-6 py-4 sm:py-5 px-2 rounded-xl font-bold text-base sm:text-lg transition-all bg-primary text-primary-foreground hover:shadow-xl hover:bg-primary/90 flex flex-row items-center justify-center gap-2 transform hover:-translate-y-0.5 mx-auto sm:w-full max-w-sm sm:max-w-none"
                     >
                       <Crown size={22} className="text-yellow-400 shrink-0" />
-                      <span className="leading-tight">Paint My Masterpiece</span>
+                      <span className="leading-tight">{t('preview_paint_my_masterpiece')}</span>
                     </button>
                   </div>
                 </div>
@@ -778,20 +778,20 @@ export default function PreviewStep() {
                   <div className="flex-1 min-w-0 space-y-4">
                     <div className="flex flex-col xl:flex-row xl:items-baseline justify-between border-b border-border/50 pb-4 gap-2 xl:gap-4 w-full overflow-hidden">
                       <div className="min-w-0 flex-1">
-                        <h4 className="font-serif font-bold text-xl sm:text-2xl text-foreground break-words whitespace-normal">High-Res Digital Masterpiece</h4>
-                        <p className="text-sm font-medium text-muted-foreground mt-1">Ready to download instantly</p>
+                        <h4 className="font-serif font-bold text-xl sm:text-2xl text-foreground break-words whitespace-normal">{t('preview_digital_title')}</h4>
+                        <p className="text-sm font-medium text-muted-foreground mt-1">{t('preview_digital_subtitle')}</p>
                       </div>
-                      <span className="text-2xl sm:text-3xl font-bold text-foreground whitespace-nowrap">$20</span>
+                      <span className="text-2xl sm:text-3xl font-bold text-foreground whitespace-nowrap">{t('preview_digital_price')}</span>
                     </div>
 
                     <div className="space-y-2 text-sm text-muted-foreground">
                       <p className="flex items-start gap-2">
                         <Check size={16} className="text-primary mt-0.5 shrink-0" />
-                        <span>High-resolution, completely <strong className="text-foreground">watermark-free</strong>.</span>
+                        <span dangerouslySetInnerHTML={{ __html: t('preview_digital_benefit_1') }} />
                       </p>
                       <p className="flex items-start gap-2">
                         <Check size={16} className="text-primary mt-0.5 shrink-0" />
-                        <span>Perfect for <strong className="text-foreground">social media</strong> or your own printing.</span>
+                        <span dangerouslySetInnerHTML={{ __html: t('preview_digital_benefit_2') }} />
                       </p>
                     </div>
 
@@ -800,7 +800,7 @@ export default function PreviewStep() {
                       className="w-full mt-4 py-3 sm:py-4 px-2 rounded-lg font-bold text-[14px] sm:text-base transition-all bg-secondary text-secondary-foreground hover:shadow-md hover:bg-secondary/80 border border-transparent shadow-sm flex items-center justify-center gap-2 mx-auto sm:w-full max-w-sm sm:max-w-none"
                     >
                       <Download size={18} className="shrink-0" />
-                      <span className="leading-tight">Download Digital Masterpiece</span>
+                      <span className="leading-tight">{t('preview_digital_button')}</span>
                     </button>
                   </div>
                 </div>
@@ -815,30 +815,28 @@ export default function PreviewStep() {
               <p className="text-xl text-primary font-medium italic">{t('preview_store_subtitle')}</p>
 
               <div className="bg-card p-6 rounded-xl border border-border shadow-sm space-y-4">
-                <p className="text-muted-foreground leading-relaxed">
-                  You've seen the portrait. Now make it permanent... Commission one of our master artists to bring your digital concept to life. <strong className="text-foreground">100% hand-painted using authentic oil paints on premium canvas</strong>—just like the royals did it.
-                </p>
+                <p className="text-muted-foreground leading-relaxed" dangerouslySetInnerHTML={{ __html: t('preview_description') }} />
 
                 <ul className="space-y-3 pt-2">
                   <li className="flex items-start gap-3 text-sm">
                     <Paintbrush className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                     <div>
-                      <strong className="text-foreground block">Real Art, Real Artists</strong>
-                      <span className="text-muted-foreground">No digital printing. Every brushstroke is painted by hand.</span>
+                      <strong className="text-foreground block">{t('preview_real_art_title')}</strong>
+                      <span className="text-muted-foreground">{t('preview_real_art_desc')}</span>
                     </div>
                   </li>
                   <li className="flex items-start gap-3 text-sm">
                     <Landmark className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                     <div>
-                      <strong className="text-foreground block">Museum Quality</strong>
-                      <span className="text-muted-foreground">Rich, textured oil paints that look incredible on any wall.</span>
+                      <strong className="text-foreground block">{t('preview_museum_title')}</strong>
+                      <span className="text-muted-foreground">{t('preview_museum_desc')}</span>
                     </div>
                   </li>
                   <li className="flex items-start gap-3 text-sm">
                     <Crown className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                     <div>
-                      <strong className="text-foreground block">The Ultimate Heirloom</strong>
-                      <span className="text-muted-foreground">A timeless conversation piece guaranteed to outlast your hard drive.</span>
+                      <strong className="text-foreground block">{t('preview_heirloom_title')}</strong>
+                      <span className="text-muted-foreground">{t('preview_heirloom_desc')}</span>
                     </div>
                   </li>
                 </ul>
@@ -857,7 +855,7 @@ export default function PreviewStep() {
                 onClick={handleBack}
                 className="w-full py-4 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors border border-dashed border-border rounded-xl"
               >
-                Not quite right? → Generate a new portrait
+                {t('preview_generate_another')}
               </button>
             </div>
           </div>
@@ -866,10 +864,10 @@ export default function PreviewStep() {
         {/* Social Proof */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-12 border-t border-border">
           {[
-            { label: 'Happy Customers', val: '10,000+' },
-            { label: 'Rating', val: '4.8★' },
-            { label: 'Secure', val: 'SSL' },
-            { label: 'Privacy', val: '100%' },
+            { label: t('preview_stat_customers'), val: '10,000+' },
+            { label: t('preview_stat_rating'), val: '4.8★' },
+            { label: t('preview_stat_secure'), val: 'SSL' },
+            { label: t('preview_stat_privacy'), val: '100%' },
           ].map((stat, i) => (
             <div key={i} className="text-center">
               <p className="text-xl font-bold text-primary">{stat.val}</p>
@@ -888,17 +886,17 @@ export default function PreviewStep() {
           >
             <span className="flex items-center gap-2">
               <Crown size={20} className="text-yellow-400 shrink-0" />
-              Paint My Masterpiece
+              {t('preview_paint_my_masterpiece')}
             </span>
             <span className="flex items-center gap-2 text-[10px] font-normal text-primary-foreground/70">
-              <Lock size={9} /> Secure · ★ 4.8 · 10,000+ sold
+              <Lock size={9} /> {t('preview_trust_badge')}
             </span>
           </button>
           <button
             onClick={() => { setSelectedProduct('digital'); setStep('checkout'); }}
             className="w-full py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
-            Or get digital copy — $20
+            {t('preview_or_digital')}
           </button>
         </div>
       )}
