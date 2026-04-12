@@ -483,57 +483,59 @@ export default function UploadStep() {
 
 
         {/* Who We Are Section */}
-        <div className="text-center space-y-8 max-w-3xl mx-auto pt-8 border-t border-border">
-          <div className="space-y-4">
-            <h2 className="font-serif text-4xl md:text-5xl font-bold text-foreground">
-              {t('cred_title_1')}
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              {t('cred_desc_1')}
-            </p>
-          </div>
+        <div className="max-w-5xl mx-auto pt-6 md:pt-8 px-2 sm:px-4 md:px-0 border-t border-border">
+          <div className="space-y-6 md:space-y-7">
+            <div className="space-y-3 text-center max-w-3xl mx-auto">
+              <h2 className="font-serif text-3xl md:text-4xl font-bold leading-tight text-foreground">
+                {t('cred_title_1')}
+              </h2>
+              <p className="text-base md:text-lg leading-relaxed text-muted-foreground">
+                {t('cred_desc_1')}
+              </p>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="space-y-3 flex flex-col items-center text-center"
-            >
-              <div className="p-4 bg-primary/10 text-primary rounded-full mb-2">
-                <Paintbrush className="w-8 h-8" />
-              </div>
-              <h3 className="font-bold text-lg text-foreground">{t('cred_title_2')}</h3>
-              <p className="text-sm text-muted-foreground">{t('cred_desc_2')}</p>
-            </motion.div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 px-1 sm:px-2 md:px-0">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="space-y-2 text-left"
+              >
+                <div className="flex items-center gap-2 text-primary">
+                  <Paintbrush className="w-5 h-5 shrink-0" />
+                  <h3 className="font-semibold text-base text-foreground leading-snug">{t('cred_title_2')}</h3>
+                </div>
+                <p className="text-sm leading-relaxed text-muted-foreground">{t('cred_desc_2')}</p>
+              </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="space-y-3 flex flex-col items-center text-center"
-            >
-              <div className="p-4 bg-primary/10 text-primary rounded-full mb-2">
-                <Crown className="w-8 h-8" />
-              </div>
-              <h3 className="font-bold text-lg text-foreground">{t('cred_title_3')}</h3>
-              <p className="text-sm text-muted-foreground">{t('cred_desc_3')}</p>
-            </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 }}
+                className="space-y-2 text-left"
+              >
+                <div className="flex items-center gap-2 text-primary">
+                  <Crown className="w-5 h-5 shrink-0" />
+                  <h3 className="font-semibold text-base text-foreground leading-snug">{t('cred_title_3')}</h3>
+                </div>
+                <p className="text-sm leading-relaxed text-muted-foreground">{t('cred_desc_3')}</p>
+              </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="space-y-3 flex flex-col items-center text-center"
-            >
-              <div className="p-4 bg-primary/10 text-primary rounded-full mb-2">
-                <Landmark className="w-8 h-8" />
-              </div>
-              <h3 className="font-bold text-lg text-foreground">{t('cred_title_4')}</h3>
-              <p className="text-sm text-muted-foreground">{t('cred_desc_4')}</p>
-            </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+                className="space-y-2 text-left"
+              >
+                <div className="flex items-center gap-2 text-primary">
+                  <Landmark className="w-5 h-5 shrink-0" />
+                  <h3 className="font-semibold text-base text-foreground leading-snug">{t('cred_title_4')}</h3>
+                </div>
+                <p className="text-sm leading-relaxed text-muted-foreground">{t('cred_desc_4')}</p>
+              </motion.div>
+            </div>
           </div>
         </div>
 

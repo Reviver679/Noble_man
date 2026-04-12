@@ -39,7 +39,7 @@ export default function CredibilitySection() {
 
                 {/* Testimonials Section */}
                 <div>
-                    <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-4 pl-[1px] scrollbar-hide">
+                    <div className="flex gap-3 overflow-x-auto overflow-y-hidden snap-x snap-proximity md:snap-mandatory overscroll-x-contain pb-4 pl-[1px] scrollbar-hide">
                         {TESTIMONIALS.map((item, i) => (
                             <motion.div
                                 key={item.nameKey}
