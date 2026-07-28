@@ -295,7 +295,6 @@ export default function UploadStep({ previewImage }: UploadStepProps = {}) {
                       </button>
                     </motion.div>
                   ))}
-                  /store/hooleefakstore/settings
                   {previews.length < MAX_FILES && (
                     <motion.button
                       initial={{ opacity: 0 }}
@@ -412,7 +411,7 @@ export default function UploadStep({ previewImage }: UploadStepProps = {}) {
           transition={{ delay: 0.5, duration: 0.5 }}
           onClick={handleSubmit}
           disabled={files.length === 0 || isCheckingLimit}
-          className="w-full py-4 bg-primary text-primary-foreground rounded-lg font-bold text-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+          className="w-full py-4 bg-primary text-primary-foreground rounded-full font-semibold text-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
         >
           {isCheckingLimit ? (
             <>

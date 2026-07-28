@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useUploadContext } from '@/lib/uploadContext';
 import Header from '@/components/header/Header';
-import StylePickerStep from '@/components/steps/StylePickerStep';
+import HomeLanding from '@/components/home/HomeLanding';
 import PreviewStep from '@/components/steps/PreviewStep';
 import CheckoutModal from '@/components/checkout/CheckoutModal';
 import SuccessStep from '@/components/steps/SuccessStep';
@@ -75,7 +75,7 @@ export default function Home() {
           ) : step === 'success' ? (
             <SuccessStep />
           ) : (
-            <StylePickerStep />
+            <HomeLanding />
           )}
         </motion.main>
       )}

@@ -3,85 +3,73 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * Nobilified — dark atelier theme.
+ * Near-black warm background, ivory type, white pill CTAs,
+ * deep ember-red glows behind key sections.
+ */
 :root {
-  --background: oklch(0.96 0.02 80);
-  --foreground: oklch(0.20 0.05 20);
-  --card: oklch(0.98 0.01 80);
-  --card-foreground: oklch(0.20 0.05 20);
-  --popover: oklch(0.98 0.01 80);
-  --popover-foreground: oklch(0.20 0.05 20);
-  --primary: oklch(0.35 0.15 20);
-  --primary-foreground: oklch(0.95 0.05 85);
-  --secondary: oklch(0.75 0.15 80);
-  --secondary-foreground: oklch(0.15 0.04 20);
-  --muted: oklch(0.90 0.02 80);
-  --muted-foreground: oklch(0.40 0.05 20);
-  --accent: oklch(0.75 0.15 80);
-  --accent-foreground: oklch(0.15 0.04 20);
-  --destructive: oklch(0.50 0.20 25);
-  --destructive-foreground: oklch(0.98 0.01 80);
-  --border: oklch(0.85 0.03 80);
-  --input: oklch(0.85 0.03 80);
-  --ring: oklch(0.75 0.15 80);
-  --chart-1: oklch(0.35 0.15 20);
-  --chart-2: oklch(0.75 0.15 80);
-  --chart-3: oklch(0.25 0.10 20);
-  --chart-4: oklch(0.80 0.10 80);
-  --chart-5: oklch(0.45 0.15 20);
-  --radius: 0.5rem;
-  --sidebar: oklch(0.96 0.02 80);
-  --sidebar-foreground: oklch(0.20 0.05 20);
-  --sidebar-primary: oklch(0.35 0.15 20);
-  --sidebar-primary-foreground: oklch(0.95 0.05 85);
-  --sidebar-accent: oklch(0.75 0.15 80);
-  --sidebar-accent-foreground: oklch(0.15 0.04 20);
-  --sidebar-border: oklch(0.85 0.03 80);
-  --sidebar-ring: oklch(0.75 0.15 80);
+  --background: oklch(0.145 0.008 55);
+  --foreground: oklch(0.94 0.02 85);
+  --card: oklch(0.19 0.015 50);
+  --card-foreground: oklch(0.94 0.02 85);
+  --popover: oklch(0.19 0.015 50);
+  --popover-foreground: oklch(0.94 0.02 85);
+  --primary: oklch(0.97 0.005 85);
+  --primary-foreground: oklch(0.17 0.012 50);
+  --secondary: oklch(0.26 0.025 45);
+  --secondary-foreground: oklch(0.94 0.02 85);
+  --muted: oklch(0.22 0.015 50);
+  --muted-foreground: oklch(0.68 0.02 70);
+  --accent: oklch(0.78 0.09 80);
+  --accent-foreground: oklch(0.17 0.012 50);
+  --destructive: oklch(0.58 0.19 27);
+  --destructive-foreground: oklch(0.97 0.005 85);
+  --border: oklch(0.94 0.02 85 / 0.13);
+  --input: oklch(0.94 0.02 85 / 0.16);
+  --ring: oklch(0.78 0.09 80);
+  --chart-1: oklch(0.78 0.09 80);
+  --chart-2: oklch(0.58 0.19 27);
+  --chart-3: oklch(0.94 0.02 85);
+  --chart-4: oklch(0.45 0.12 35);
+  --chart-5: oklch(0.68 0.02 70);
+  --radius: 0.75rem;
+  --sidebar: oklch(0.145 0.008 55);
+  --sidebar-foreground: oklch(0.94 0.02 85);
+  --sidebar-primary: oklch(0.97 0.005 85);
+  --sidebar-primary-foreground: oklch(0.17 0.012 50);
+  --sidebar-accent: oklch(0.26 0.025 45);
+  --sidebar-accent-foreground: oklch(0.94 0.02 85);
+  --sidebar-border: oklch(0.94 0.02 85 / 0.13);
+  --sidebar-ring: oklch(0.78 0.09 80);
 }
 
-@theme inline {
-  --font-serif: 'Playfair Display', 'Georgia', serif;
-  --font-sans: 'Inter', system-ui, sans-serif;
-}
-
+/* The app is dark-only; .dark mirrors :root so either class works. */
 .dark {
-  --background: oklch(0.15 0.03 20);
-  --foreground: oklch(0.95 0.03 85);
-  --card: oklch(0.18 0.04 20);
-  --card-foreground: oklch(0.95 0.03 85);
-  --popover: oklch(0.18 0.04 20);
-  --popover-foreground: oklch(0.95 0.03 85);
-  --primary: oklch(0.45 0.18 20);
-  --primary-foreground: oklch(0.98 0.02 85);
-  --secondary: oklch(0.75 0.15 85);
-  --secondary-foreground: oklch(0.15 0.03 20);
-  --muted: oklch(0.22 0.04 20);
-  --muted-foreground: oklch(0.75 0.05 85);
-  --accent: oklch(0.75 0.15 85);
-  --accent-foreground: oklch(0.15 0.03 20);
-  --destructive: oklch(0.50 0.20 25);
-  --destructive-foreground: oklch(0.95 0.03 85);
-  --border: oklch(0.30 0.05 20);
-  --input: oklch(0.25 0.04 20);
-  --ring: oklch(0.75 0.15 85);
-  --chart-1: oklch(0.45 0.18 20);
-  --chart-2: oklch(0.75 0.15 85);
-  --chart-3: oklch(0.25 0.10 20);
-  --chart-4: oklch(0.80 0.10 85);
-  --chart-5: oklch(0.55 0.18 20);
-  --sidebar: oklch(0.15 0.03 20);
-  --sidebar-foreground: oklch(0.95 0.03 85);
-  --sidebar-primary: oklch(0.45 0.18 20);
-  --sidebar-primary-foreground: oklch(0.98 0.02 85);
-  --sidebar-accent: oklch(0.75 0.15 85);
-  --sidebar-accent-foreground: oklch(0.15 0.03 20);
-  --sidebar-border: oklch(0.30 0.05 20);
-  --sidebar-ring: oklch(0.75 0.15 85);
+  --background: oklch(0.145 0.008 55);
+  --foreground: oklch(0.94 0.02 85);
+  --card: oklch(0.19 0.015 50);
+  --card-foreground: oklch(0.94 0.02 85);
+  --popover: oklch(0.19 0.015 50);
+  --popover-foreground: oklch(0.94 0.02 85);
+  --primary: oklch(0.97 0.005 85);
+  --primary-foreground: oklch(0.17 0.012 50);
+  --secondary: oklch(0.26 0.025 45);
+  --secondary-foreground: oklch(0.94 0.02 85);
+  --muted: oklch(0.22 0.015 50);
+  --muted-foreground: oklch(0.68 0.02 70);
+  --accent: oklch(0.78 0.09 80);
+  --accent-foreground: oklch(0.17 0.012 50);
+  --destructive: oklch(0.58 0.19 27);
+  --destructive-foreground: oklch(0.97 0.005 85);
+  --border: oklch(0.94 0.02 85 / 0.13);
+  --input: oklch(0.94 0.02 85 / 0.16);
+  --ring: oklch(0.78 0.09 80);
 }
 
 @theme inline {
-  --font-sans: 'Geist', 'Geist Fallback';
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --font-serif: var(--font-playfair), 'Playfair Display', Georgia, serif;
+  --font-sans: var(--font-inter), 'Inter', system-ui, sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -130,6 +118,31 @@
   }
 }
 
+/* Ember glows behind sections (deep warm red radiating out of black) */
+.glow-hero {
+  background:
+    radial-gradient(120% 70% at 50% 108%, oklch(0.32 0.11 32 / 0.75) 0%, transparent 62%),
+    radial-gradient(80% 45% at 50% 115%, oklch(0.42 0.15 30 / 0.5) 0%, transparent 60%);
+}
+
+.glow-ember {
+  background:
+    radial-gradient(90% 90% at 50% 45%, oklch(0.34 0.12 30 / 0.85) 0%, transparent 68%);
+}
+
+.glow-ember-soft {
+  background:
+    radial-gradient(100% 80% at 50% 20%, oklch(0.30 0.10 32 / 0.55) 0%, transparent 65%);
+}
+
+/* Small uppercase tracking label, e.g. "PICK A STYLE (OPTIONAL)" */
+.eyebrow {
+  font-size: 0.675rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
 /* Marquee animation for the rate-limit banner */
 @keyframes marquee {
   0%   { transform: translateX(0); }
@@ -140,7 +153,7 @@
   animation: marquee 20s linear infinite;
 }
 
-/* Hide scrollbar for testimonials strip */
+/* Hide scrollbar for horizontal strips */
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;

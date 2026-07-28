@@ -1,14 +1,17 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono, Playfair_Display, Inter } from 'next/font/google'
+import { Playfair_Display, Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { I18nProvider } from '@/components/providers/I18nProvider'
 import { UploadProvider } from '@/lib/uploadContext'
+import AnnouncementBar from '@/components/home/AnnouncementBar'
 import './globals.css'
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
-const _playfairDisplay = Playfair_Display({ subsets: ["latin"] });
-const _inter = Inter({ subsets: ["latin"] });
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  style: ['normal', 'italic'],
+  variable: '--font-playfair',
+})
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
 export const metadata: Metadata = {
   title: 'Nobilified - See Yourself as Royalty. Free Preview, No Credit Card.',
@@ -21,18 +24,17 @@ export const metadata: Metadata = {
   },
 }
 
-const isDarkMode = false; // Internal variable to quickly switch between dark and light mode
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`font-sans antialiased ${isDarkMode ? 'dark' : ''}`} suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={`${playfair.variable} ${inter.variable}`}>
+      <body className="font-sans antialiased dark" suppressHydrationWarning>
         <I18nProvider>
           <UploadProvider>
+            <AnnouncementBar />
             {children}
           </UploadProvider>
         </I18nProvider>
