@@ -1,5 +1,6 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -11,6 +12,11 @@ const FALLBACK = 'Free preview · Digital from $20 · Hand-painted canvas from $
 
 export default function AnnouncementBar() {
   const { t } = useTranslation();
+  const pathname = usePathname();
+
+  // The admin area has its own chrome and no storefront messaging.
+  if (pathname?.startsWith('/admin')) return null;
+
   return (
     <div className="w-full bg-primary py-2.5 text-center">
       <p className="px-4 text-[10px] font-semibold uppercase tracking-[0.25em] text-primary-foreground md:text-[11px]">
