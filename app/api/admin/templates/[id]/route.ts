@@ -41,13 +41,14 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
   }
 }
 
+/** Soft delete: flags the template inactive in the backend rather than destroying it. */
 export async function DELETE(_req: NextRequest, { params }: RouteContext) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
   try {
     const { id } = await params;
-    await getTemplateStore().remove(id);
+    await getTemplateStore().deactivate(id);
     return NextResponse.json({ ok: true });
   } catch (error) {
     return errorResponse(error);

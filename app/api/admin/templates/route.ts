@@ -39,7 +39,9 @@ export async function POST(req: NextRequest) {
       promptText,
       templateImage: typeof body.templateImage === 'string' ? body.templateImage : '',
       category: parseCategory(body.category),
-      isActive: body.isActive !== false,
+      // The admin has no active/inactive control — everything it creates is live,
+      // and removing a template is what flips it inactive.
+      isActive: true,
       isTopSelling: body.isTopSelling === true,
       isStaffPick: body.isStaffPick === true,
     };

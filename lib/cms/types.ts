@@ -43,11 +43,16 @@ export interface UploadedImage {
 }
 
 export interface TemplateStore {
+  /** Active templates only — inactive records are retired and stay hidden from the admin. */
   list(): Promise<AdminTemplate[]>;
   get(id: string): Promise<AdminTemplate | null>;
   create(input: TemplateInput): Promise<AdminTemplate>;
   update(id: string, patch: TemplatePatch): Promise<AdminTemplate>;
-  remove(id: string): Promise<void>;
+  /**
+   * Retire a template by flagging it inactive in the backend. Records are never
+   * hard-deleted, so history and any references to them survive.
+   */
+  deactivate(id: string): Promise<void>;
   uploadImage(file: File): Promise<UploadedImage>;
 }
 

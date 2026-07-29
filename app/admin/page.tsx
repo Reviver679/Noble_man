@@ -71,7 +71,6 @@ export default function AdminPage() {
       const payload: Record<string, unknown> = {
         promptText: form.promptText,
         category: form.category,
-        isActive: form.isActive,
         isTopSelling: form.isTopSelling,
         isStaffPick: form.isStaffPick,
       };
@@ -107,7 +106,10 @@ export default function AdminPage() {
   };
 
   const remove = async (t: AdminTemplate) => {
-    if (!window.confirm(`Delete “${t.templateName}”? This cannot be undone.`)) return;
+    const ok = window.confirm(
+      `Delete “${t.templateName}”? It will be marked inactive in the backend and disappear from this list.`
+    );
+    if (!ok) return;
     setDeletingId(t.id);
     try {
       const res = await fetch(`/api/admin/templates/${encodeURIComponent(t.id)}`, {
@@ -219,9 +221,6 @@ export default function AdminPage() {
                   </p>
 
                   <div className="mt-2 flex flex-wrap gap-1.5">
-                    <Badge tone={t.isActive ? 'good' : 'muted'}>
-                      {t.isActive ? 'Active' : 'Inactive'}
-                    </Badge>
                     {t.category && <Badge>{t.category}</Badge>}
                     {t.isTopSelling && <Badge>Top selling</Badge>}
                     {t.isStaffPick && <Badge>Staff pick</Badge>}
@@ -298,14 +297,9 @@ export default function AdminPage() {
   );
 }
 
-function Badge({ children, tone = 'default' }: { children: React.ReactNode; tone?: 'default' | 'good' | 'muted' }) {
-  const tones = {
-    default: 'border-border text-muted-foreground',
-    good: 'border-emerald-500/40 text-emerald-400',
-    muted: 'border-border text-muted-foreground/60',
-  };
+function Badge({ children }: { children: React.ReactNode }) {
   return (
-    <span className={`rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-wider ${tones[tone]}`}>
+    <span className="rounded-full border border-border px-2 py-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">
       {children}
     </span>
   );

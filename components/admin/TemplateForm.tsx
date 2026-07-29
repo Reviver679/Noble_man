@@ -10,7 +10,6 @@ export interface TemplateFormValues {
   templateImage: string;
   imagePreview: string;
   category: TemplateCategory;
-  isActive: boolean;
   isTopSelling: boolean;
   isStaffPick: boolean;
 }
@@ -22,7 +21,6 @@ export function emptyForm(): TemplateFormValues {
     templateImage: '',
     imagePreview: '',
     category: null,
-    isActive: true,
     isTopSelling: false,
     isStaffPick: false,
   };
@@ -36,7 +34,6 @@ export function formFromTemplate(t: AdminTemplate): TemplateFormValues {
     templateImage: '',
     imagePreview: t.templateImage,
     category: t.category,
-    isActive: t.isActive,
     isTopSelling: t.isTopSelling,
     isStaffPick: t.isStaffPick,
   };
@@ -208,7 +205,6 @@ export default function TemplateForm({
       <div className="space-y-2.5">
         {(
           [
-            ['isActive', 'Active — visible on the site'],
             ['isTopSelling', 'Show in Top Selling'],
             ['isStaffPick', 'Show in Staff Picks'],
           ] as const

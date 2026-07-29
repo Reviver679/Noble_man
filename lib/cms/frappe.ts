@@ -121,8 +121,10 @@ export const frappeTemplateStore: TemplateStore = {
         'is_staff_pick',
       ])
     );
+    // Inactive templates are retired — the admin never lists them.
+    const filters = encodeURIComponent(JSON.stringify([['is_active', '=', 1]]));
     const res = await request(
-      `/api/resource/${encodeURIComponent(DOCTYPE)}?fields=${fields}&limit_page_length=0&order_by=creation%20desc`
+      `/api/resource/${encodeURIComponent(DOCTYPE)}?fields=${fields}&filters=${filters}&limit_page_length=0&order_by=creation%20desc`
     );
     if (!res.ok) {
       throw new CmsError(await readError(res, 'Failed to load templates'), res.status);
@@ -168,12 +170,14 @@ export const frappeTemplateStore: TemplateStore = {
     return toAdminTemplate(json.data);
   },
 
-  async remove(id) {
+  async deactivate(id) {
     const res = await request(`/api/resource/${encodeURIComponent(DOCTYPE)}/${encodeURIComponent(id)}`, {
-      method: 'DELETE',
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ is_active: 0 }),
     });
     if (!res.ok) {
-      throw new CmsError(await readError(res, 'Failed to delete template'), res.status);
+      throw new CmsError(await readError(res, 'Failed to remove template'), res.status);
     }
   },
 
