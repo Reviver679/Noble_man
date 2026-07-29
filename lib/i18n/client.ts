@@ -5,6 +5,7 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import resourcesToBackend from 'i18next-resources-to-backend';
 import { SUPPORTED_LOCALES, resolveLocale } from '@/types/i18n';
+import enCommon from '@/public/locales/en/common.json';
 
 const languageDetector = new LanguageDetector();
 languageDetector.addDetector({
@@ -36,6 +37,10 @@ i18next
     })
   )
   .init({
+    // English ships in the bundle so SSR and first paint render real copy instead of
+    // bare keys; every other locale is still fetched from /locales at runtime.
+    resources: { en: { common: enCommon } },
+    partialBundledLanguages: true,
     fallbackLng: 'en',
     supportedLngs: SUPPORTED_LOCALES,
     defaultNS: 'common',

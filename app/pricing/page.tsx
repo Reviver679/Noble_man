@@ -1,7 +1,13 @@
 import Link from 'next/link';
 import Header from '@/components/header/Header';
 
-const canvasOptions = [
+const canvasOptions: Array<{
+  name: string;
+  size: string;
+  price: number;
+  description: string;
+  badge?: string;
+}> = [
   {
     name: 'Classic Canvas',
     size: '16 x 20 in',
@@ -21,7 +27,7 @@ const canvasOptions = [
     price: 590,
     description: 'A large gallery-style centerpiece for maximum royal drama.',
   },
-] as const;
+];
 
 const canvasDetails = [
   '100% hand-painted oil on canvas by master artists',

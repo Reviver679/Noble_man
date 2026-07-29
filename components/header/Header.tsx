@@ -2,15 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { useUploadContext, type UploadStep } from '@/lib/uploadContext';
-import { Menu, User, PawPrint, AlertTriangle } from 'lucide-react';
+import { useUploadContext } from '@/lib/uploadContext';
+import { Menu, AlertTriangle } from 'lucide-react';
 import Sidebar from './Sidebar';
 import { useTranslation } from 'react-i18next';
 
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
-  const { step, style, setStyle, reset } = useUploadContext();
+  const { step, reset } = useUploadContext();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [rateLimitedMsg, setRateLimitedMsg] = useState<string | null>(null);
   const { t } = useTranslation();
@@ -35,24 +35,27 @@ export default function Header() {
     })();
   }, []);
 
-  // Breadcrumb labels
   const stepLabels = [t('step_upload'), t('step_preview'), t('step_download')];
-  const currentStepIndex = step === 'generating' ? 1 : step === 'preview' ? 1 : step === 'checkout' ? 2 : step === 'success' ? 2 : 0;
+  const currentStepIndex =
+    step === 'generating' || step === 'preview' ? 1 : step === 'checkout' || step === 'success' ? 2 : 0;
+  const showBreadcrumb = step !== 'idle';
 
   return (
-    <header className={`z-50 w-full bg-white ${step === 'preview' || step === 'checkout' ? 'relative' : 'sticky top-0'}`}>
-
-      {/* Rate-limit marquee banner */}
+    <header
+      className={`z-50 w-full bg-background/90 backdrop-blur-md ${
+        step === 'preview' || step === 'checkout' ? 'relative' : 'sticky top-0'
+      }`}
+    >
       {/* Rate-limit marquee banner */}
       {rateLimitedMsg && (
-        <div className="bg-secondary/40 border-b border-border py-2 overflow-hidden">
-          <div className="marquee-track flex whitespace-nowrap gap-16 animate-marquee">
+        <div className="overflow-hidden border-b border-border bg-secondary/40 py-2">
+          <div className="marquee-track flex gap-16 whitespace-nowrap animate-marquee">
             {[...Array(4)].map((_, i) => (
               <span
                 key={i}
-                className="inline-flex items-center gap-2 text-xs text-muted-foreground font-medium shrink-0"
+                className="inline-flex shrink-0 items-center gap-2 text-xs font-medium text-muted-foreground"
               >
-                <AlertTriangle size={12} className="opacity-60 shrink-0" />
+                <AlertTriangle size={12} className="shrink-0 opacity-60" />
                 {rateLimitedMsg}
               </span>
             ))}
@@ -61,74 +64,51 @@ export default function Header() {
       )}
 
       {/* Main header */}
-      <div className="bg-background border-b border-border px-4 md:px-8 py-6">
-        <div className="max-w-6xl mx-auto">
-          {/* Top bar with logo centered and buttons */}
-          <div className="flex items-center justify-between mb-6">
-            {/* Logo - Left */}
-            <div
-              onClick={() => {
-                if (pathname !== '/') {
-                  router.push('/');
-                } else {
-                  localStorage.removeItem('noblified_request_id');
-                  reset();
-                }
-              }}
-              className="flex flex-col hover:opacity-80 transition-opacity cursor-pointer"
-            >
-              {/* Logo image */}
-              <img src="/nobilified.png" alt="Nobilified" className="h-8 md:h-10 w-auto object-contain" />
-            </div>
-
-            {/* Style Toggle - Center */}
-            <div className="flex items-center gap-1 bg-card rounded-full px-1.5 py-1.5 border border-border">
-              <button
-                onClick={() => setStyle('Self-Portraits')}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors flex items-center gap-1.5 ${style !== 'Pet Portraits'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-foreground hover:bg-secondary'
-                  }`}
-              >
-                <User size={14} />
-                {t('style_human')}
-              </button>
-              <button
-                onClick={() => setStyle('Pet Portraits')}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors flex items-center gap-1.5 ${style === 'Pet Portraits'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-foreground hover:bg-secondary'
-                  }`}
-              >
-                <PawPrint size={14} />
-                {t('style_pets')}
-              </button>
-            </div>
-
-            {/* Actions - Right */}
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setIsSidebarOpen(true)}
-                className="p-2 hover:bg-secondary rounded-lg transition-colors"
-              >
-                <Menu size={20} className="text-foreground" />
-              </button>
-            </div>
+      <div className="border-b border-border px-4 py-4 md:px-8">
+        <div className="mx-auto flex max-w-7xl items-center justify-between">
+          {/* Wordmark */}
+          <div
+            onClick={() => {
+              if (pathname !== '/') {
+                router.push('/');
+              } else {
+                localStorage.removeItem('noblified_request_id');
+                reset();
+              }
+            }}
+            className="cursor-pointer transition-opacity hover:opacity-80"
+          >
+            <span className="font-serif text-2xl tracking-tight text-foreground md:text-3xl">
+              Nobilified
+            </span>
           </div>
 
-          {/* Breadcrumb - Centered */}
-          <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
-            {stepLabels.map((label, index) => (
-              <React.Fragment key={label}>
-                <span
-                  className={index <= currentStepIndex ? 'text-foreground font-medium' : 'text-muted-foreground'}
-                >
-                  {label}
-                </span>
-                {index < stepLabels.length - 1 && <span className="text-muted-foreground">›</span>}
-              </React.Fragment>
-            ))}
-          </div>
+          {/* Breadcrumb — only while creating */}
+          {showBreadcrumb && (
+            <div className="hidden items-center gap-1 text-xs text-muted-foreground md:flex">
+              {stepLabels.map((label, index) => (
+                <React.Fragment key={label}>
+                  <span
+                    className={
+                      index <= currentStepIndex ? 'font-medium text-foreground' : 'text-muted-foreground'
+                    }
+                  >
+                    {label}
+                  </span>
+                  {index < stepLabels.length - 1 && <span>›</span>}
+                </React.Fragment>
+              ))}
+            </div>
+          )}
+
+          {/* Menu */}
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="rounded-lg p-2 transition-colors hover:bg-secondary"
+            aria-label="Open menu"
+          >
+            <Menu size={20} className="text-foreground" />
+          </button>
         </div>
       </div>
 
